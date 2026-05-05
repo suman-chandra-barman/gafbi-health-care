@@ -5,6 +5,7 @@ import { Asap_Condensed, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import I18nProvider from "@/components/CommonComponents/I18nProvider";
 import { ToastContainer } from "react-toastify";
+import StoreProvider from "@/redux/StoreProvider";
 
 const asapCondensed = Asap_Condensed({
   variable: "--font-asap-condensed",
@@ -71,10 +72,12 @@ export default function RootLayout({
       className={`${asapCondensed.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[--color-background] overflow-x-hidden">
-        <I18nProvider>
-          <ToastContainer />
-          {children}
-        </I18nProvider>
+        <StoreProvider>
+          <I18nProvider>
+            <ToastContainer />
+            {children}
+          </I18nProvider>
+        </StoreProvider>
       </body>
     </html>
   );

@@ -1,30 +1,34 @@
 /** @format */
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import Image from "next/image";
 import { useTranslation } from "react-i18next";
-import { useLoginMutation } from "@/redux/features/auth/authApi";
+import { useResetPasswordMutation } from "@/redux/features/auth/authApi";
 import { useAppDispatch } from "@/redux/hooks";
 import { setCredentials } from "@/redux/features/auth/authSlice";
 
-export default function SignInPage() {
+export default function ResetPasswordPage() {
   const { t } = useTranslation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const [login, { isLoading }] = useLoginMutation();
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
     try {
-      const response = await login({
-        email_address: email,
-        password,
+      const response = await resetPassword({
+        new_password: newPassword,
+        confirm_password: confirmPassword,
       }).unwrap();
 
       if (response?.success) {
@@ -34,21 +38,21 @@ export default function SignInPage() {
             tokens: response.data.tokens,
           }),
         );
-        toast.success(t("toasts.signedIn"));
+        toast.success(t("toasts.passwordReset"));
         router.push("/");
         return;
       }
 
-      toast.error(response?.message || "Login failed.");
+      toast.error(response?.message || "Password reset failed.");
     } catch (error) {
-      toast.error("Login failed.");
+      toast.error("Password reset failed.");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#E9EFF3] bg-opacity-80">
       <div className="bg-white rounded-lg shadow-md w-full max-w-md p-8">
-        <div className="flex flex-col items-center mb-6 border-b border-gray-300 pb-6">
+        <div className="flex flex-col items-center mb-6">
           <Image
             src="/logo.png"
             alt="Gafbi Health Care"
@@ -61,50 +65,36 @@ export default function SignInPage() {
           </h1>
         </div>
         <h2 className="text-lg font-bold text-[#1A4B5A] mb-1">
-          {t("auth.loginManage")}
+          {t("auth.resetTitle")}
         </h2>
         <p className="text-gray-700 mb-4 text-sm">
-          {t("auth.loginDescription")}
+          {t("auth.resetDescription")}
         </p>
         <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
           <input
-            type="email"
-            placeholder="Email"
+            type="password"
+            placeholder="New password"
             className="border rounded px-3 py-2"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
           />
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Confirm password"
             className="border rounded px-3 py-2"
             required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
-          <div className="flex justify-end mb-2">
-            <Link
-              href="/forgot-password"
-              className="text-xs text-[#1A4B5A] font-semibold hover:underline"
-            >
-              {t("auth.forgotPassword")}
-            </Link>
-          </div>
           <button
             type="submit"
-            className="bg-[#1A4B5A] hover:bg-[#0c617a] text-white rounded px-3 py-2 font-semibold cursor-pointer"
+            className="bg-[#1A4B5A] text-white rounded px-3 py-2 font-semibold cursor-pointer"
             disabled={isLoading}
           >
-            {isLoading ? t("auth.signingIn") : t("auth.login")}
+            {isLoading ? t("auth.resetting") : t("auth.reset")}
           </button>
         </form>
-        <Link
-          href="/register"
-          className="block mt-4 border border-[#1A4B5A] text-[#1A4B5A] rounded px-3 py-2 text-center font-semibold hover:bg-[#1A4B5A] hover:text-white transition"
-        >
-          {t("auth.createAccount")}
-        </Link>
       </div>
     </div>
   );

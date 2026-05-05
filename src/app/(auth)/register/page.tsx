@@ -7,27 +7,46 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import TermsConnect from "../../(main)/terms/connect";
 import { useTranslation } from "react-i18next";
+import { useSignupMutation } from "@/redux/features/auth/authApi";
 
 export default function RegisterPage() {
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [signup, { isLoading }] = useSignupMutation();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!acceptTerms) {
       toast.error(t("toasts.acceptTerms"));
       return;
     }
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      toast.success(t("toasts.accountCreated"));
-      router.push("/verify-otp");
-    }, 1200);
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
+    try {
+      const response = await signup({
+        email_address: email,
+        password,
+        confirm_password: confirmPassword,
+      }).unwrap();
+
+      if (response?.success) {
+        localStorage.setItem("pendingEmail", email);
+        toast.success(t("toasts.accountCreated"));
+        router.push("/email-verify");
+        return;
+      }
+
+      toast.error(response?.message || "Signup failed.");
+    } catch (error) {
+      toast.error("Signup failed.");
+    }
   };
 
   return (
@@ -68,6 +87,14 @@ export default function RegisterPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          <input
+            type="password"
+            placeholder="Confirm password"
+            className="border rounded px-3 py-2"
+            required
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
           <label className="flex items-center gap-2 text-xs mt-1">
             <input
               type="checkbox"
@@ -82,9 +109,9 @@ export default function RegisterPage() {
           <button
             type="submit"
             className="bg-[#1A4B5A] text-white rounded px-3 py-2 font-semibold cursor-pointer"
-            disabled={loading}
+            disabled={isLoading}
           >
-            {loading ? t("auth.creating") : t("auth.create")}
+            {isLoading ? t("auth.creating") : t("auth.create")}
           </button>
         </form>
         <Link
@@ -93,12 +120,6 @@ export default function RegisterPage() {
         >
           {t("auth.backToLogin")}
         </Link>
-        <p className="mt-4 text-xs text-gray-700">
-          Are you a customer, but have not yet entered an email address?{" "}
-          <Link href="#" className="text-[#1A4B5A] underline font-semibold">
-            Please contact us
-          </Link>
-        </p>
       </div>
     </div>
   );

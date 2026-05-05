@@ -9,13 +9,13 @@ import ServicesSection from "@/components/LandingPageComponents/ServicesSection"
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--color-background)] font-sans">
+    <main className="flex min-h-screen flex-col bg-[var(--color-background)] font-sans">
       <HeroSection />
       <CareBoxSection />
       <AboutSection />
       <ClientsReviewSection />
       <ProductsSection />
       <ServicesSection />
-    </div>
+    </main>
   );
 }

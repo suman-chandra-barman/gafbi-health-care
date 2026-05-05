@@ -2,11 +2,12 @@ import { RootState } from "@/redux/store";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface User {
-  id: string;
-  full_name: string;
+  id?: string;
   email_address: string;
-  role: string;
-  profile_image: string | null;
+  is_email_verified?: boolean;
+  full_name?: string;
+  role?: string;
+  profile_image?: string | null;
   contact_number?: string;
   address?: string;
 }
@@ -21,6 +22,17 @@ const initialState: AuthState = {
   user: null,
   token: null,
   refreshToken: null,
+};
+
+const setCookie = (name: string, value: string, days = 7) => {
+  const expires = new Date(
+    Date.now() + days * 24 * 60 * 60 * 1000,
+  ).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+};
+
+const clearCookie = (name: string) => {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
 };
 
 const authSlice = createSlice({
@@ -38,11 +50,14 @@ const authSlice = createSlice({
       state.token = action.payload.tokens.access;
       state.refreshToken = action.payload.tokens.refresh;
 
-      // Persist to localStorage
+      // Persist to localStorage and cookies
       if (typeof window !== "undefined") {
         localStorage.setItem("user", JSON.stringify(action.payload.user));
         localStorage.setItem("accessToken", action.payload.tokens.access);
         localStorage.setItem("refreshToken", action.payload.tokens.refresh);
+        setCookie("user", JSON.stringify(action.payload.user));
+        setCookie("accessToken", action.payload.tokens.access);
+        setCookie("refreshToken", action.payload.tokens.refresh);
       }
     },
     logout: (state) => {
@@ -50,11 +65,14 @@ const authSlice = createSlice({
       state.token = null;
       state.refreshToken = null;
 
-      // Clear localStorage
+      // Clear localStorage and cookies
       if (typeof window !== "undefined") {
         localStorage.removeItem("user");
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
+        clearCookie("user");
+        clearCookie("accessToken");
+        clearCookie("refreshToken");
       }
     },
     updateTokens: (
@@ -67,6 +85,8 @@ const authSlice = createSlice({
       if (typeof window !== "undefined") {
         localStorage.setItem("accessToken", action.payload.accessToken);
         localStorage.setItem("refreshToken", action.payload.refreshToken);
+        setCookie("accessToken", action.payload.accessToken);
+        setCookie("refreshToken", action.payload.refreshToken);
       }
     },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
@@ -75,6 +95,7 @@ const authSlice = createSlice({
 
         if (typeof window !== "undefined") {
           localStorage.setItem("user", JSON.stringify(state.user));
+          setCookie("user", JSON.stringify(state.user));
         }
       }
     },

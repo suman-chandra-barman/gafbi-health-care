@@ -1,19 +1,20 @@
 /** @format */
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
-import { useVerifyEmailMutation } from "@/redux/features/auth/authApi";
+import { useVerifyForgotPasswordOtpMutation } from "@/redux/features/auth/authApi";
 import { useAppDispatch } from "@/redux/hooks";
 import { setCredentials } from "@/redux/features/auth/authSlice";
 
-export default function EmailVerifyPage() {
+export default function ForgotPasswordVerifyPage() {
   const { t } = useTranslation();
   const [email] = useState(() => {
     if (typeof window === "undefined") return "";
-    return localStorage.getItem("pendingEmail") || "";
+    return localStorage.getItem("forgotEmail") || "";
   });
   const otpLength = 6;
   const [otp, setOtp] = useState<string[]>(
@@ -21,14 +22,14 @@ export default function EmailVerifyPage() {
   );
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const [verifyEmail, { isLoading }] = useVerifyEmailMutation();
+  const [verifyForgotPasswordOtp, { isLoading }] =
+    useVerifyForgotPasswordOtpMutation();
 
   const handleChange = (index: number, value: string) => {
     if (/^\d?$/.test(value)) {
       const newOtp = [...otp];
       newOtp[index] = value;
       setOtp(newOtp);
-      // Move to next input if value entered
       if (value && index < otpLength - 1) {
         const next = document.getElementById(`otp-${index + 1}`);
         if (next) (next as HTMLInputElement).focus();
@@ -59,7 +60,7 @@ export default function EmailVerifyPage() {
     }
 
     try {
-      const response = await verifyEmail({
+      const response = await verifyForgotPasswordOtp({
         email_address: email,
         otp_code: otp.join(""),
       }).unwrap();
@@ -72,7 +73,7 @@ export default function EmailVerifyPage() {
           }),
         );
         toast.success(t("toasts.otpVerified"));
-        router.push("/");
+        router.push("/reset-password");
         return;
       }
 

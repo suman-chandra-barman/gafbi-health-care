@@ -6,22 +6,30 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
+import { useForgotPasswordMutation } from "@/redux/features/auth/authApi";
 
 export default function ForgotPasswordPage() {
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      toast.success(t("toasts.otpSent"));
-      router.push("/verify-otp");
-    }, 1200);
+    try {
+      const response = await forgotPassword({ email_address: email }).unwrap();
+
+      if (response?.success) {
+        localStorage.setItem("forgotEmail", email);
+        toast.success(t("toasts.otpSent"));
+        router.push("/forgot-password-verify");
+        return;
+      }
+
+      toast.error(response?.message || "Failed to send OTP.");
+    } catch (error) {
+      toast.error("Failed to send OTP.");
+    }
   };
 
   return (
@@ -57,9 +65,9 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             className="bg-[#1A4B5A] text-white rounded px-3 py-2 font-semibold cursor-pointer"
-            disabled={loading}
+            disabled={isLoading}
           >
-            {loading ? t("auth.sending") : t("auth.sendOtp")}
+            {isLoading ? t("auth.sending") : t("auth.sendOtp")}
           </button>
         </form>
       </div>
