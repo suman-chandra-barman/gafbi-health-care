@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
 
-export default function VerifyOtpPage() {
+export default function EmailVerifyPage() {
   const { t } = useTranslation();
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [loading, setLoading] = useState(false);

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import TermsConnect from "../../terms/connect";
+import TermsConnect from "../../(main)/terms/connect";
 import { useTranslation } from "react-i18next";
 
 export default function RegisterPage() {

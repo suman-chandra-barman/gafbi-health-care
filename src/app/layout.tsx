@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Asap_Condensed, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import I18nProvider from "@/components/CommonComponents/I18nProvider";
-import AppShell from "@/components/CommonComponents/AppShell";
+import { ToastContainer } from "react-toastify";
 
 const asapCondensed = Asap_Condensed({
   variable: "--font-asap-condensed",
@@ -72,7 +72,8 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-[--color-background] overflow-x-hidden">
         <I18nProvider>
-          <AppShell>{children}</AppShell>
+          <ToastContainer />
+          {children}
         </I18nProvider>
       </body>
     </html>
