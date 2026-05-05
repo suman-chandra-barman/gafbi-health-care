@@ -3,12 +3,8 @@
 import type { Metadata } from "next";
 import { Asap_Condensed, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import InfoNav from "@/components/CommonComponents/InfoNav";
-import NavBar from "@/components/CommonComponents/NavBar";
-import Footer from "@/components/CommonComponents/Footer";
-import FooterBanner from "@/components/LandingPageComponents/FooterBanner";
-import { ToastContainer } from "react-toastify";
 import I18nProvider from "@/components/CommonComponents/I18nProvider";
+import AppShell from "@/components/CommonComponents/AppShell";
 
 const asapCondensed = Asap_Condensed({
   variable: "--font-asap-condensed",
@@ -76,13 +72,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-[--color-background] overflow-x-hidden">
         <I18nProvider>
-          <ToastContainer />
-          <InfoNav />
-          <NavBar />
-
-          {children}
-          <FooterBanner />
-          <Footer />
+          <AppShell>{children}</AppShell>
         </I18nProvider>
       </body>
     </html>
