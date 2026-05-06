@@ -245,7 +245,7 @@ export default function ApplicationStep({
             </a>
           </div>
 
-          <div className="mb-4 rounded-md border-2 border-gray-200 bg-gray-50 p-4">
+          <div className="mb-4 rounded-md border-2 border-gray-200 bg-gray-50 p-3 sm:p-4">
             <p className="mb-4 text-center text-xs sm:text-sm text-gray-400">
               Please sign here (by mouse or finger movement)
             </p>
@@ -257,7 +257,8 @@ export default function ApplicationStep({
               onMouseMove={draw}
               onMouseUp={stopDrawing}
               onMouseLeave={stopDrawing}
-              className="w-full border border-gray-300 bg-white cursor-crosshair"
+              className="w-full h-auto border border-gray-300 bg-white cursor-crosshair rounded"
+              style={{ aspectRatio: "400/150", maxHeight: "200px" }}
             />
           </div>
 
@@ -319,17 +320,18 @@ export default function ApplicationStep({
           </p>
         </div>
 
-        <div className="flex justify-between">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-between\">
           <button
             onClick={onPrev}
-            className="flex cursor-pointer items-center gap-2 px-6 py-2 text-sm font-semibold text-button-bg transition-all hover:opacity-80 sm:py-3"
+            className="flex cursor-pointer items-center justify-center gap-2 px-6 py-2 text-xs sm:text-sm font-semibold text-button-bg transition-all hover:opacity-80 sm:py-3 order-2 sm:order-1\"
           >
-            <MoveLeft /> {t("common.previous")}
+            <MoveLeft />{" "}
+            <span className="hidden sm:inline\">{t("common.previous")}</span>
           </button>
           <button
             onClick={handleNext}
             disabled={!isFormValid()}
-            className="rounded-md bg-button-bg cursor-pointer px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-md bg-button-bg cursor-pointer px-6 sm:px-8 py-2 sm:py-3 text-xs sm:text-base font-semibold text-white hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2\"
           >
             {t("common.submit")}
           </button>

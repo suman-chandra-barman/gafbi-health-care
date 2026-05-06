@@ -427,17 +427,17 @@ export default function DataEntryStep({
             )}
           </div>
 
-          <div className="mt-8 flex justify-between">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-between">
             <button
               onClick={handlePrevSubStep}
-              className="flex cursor-pointer items-center gap-2 px-6 py-2 text-sm font-semibold text-button-bg transition-all hover:opacity-80 sm:py-3"
+              className="flex cursor-pointer items-center justify-center gap-2 px-6 py-2 text-xs sm:text-sm font-semibold text-button-bg transition-all hover:opacity-80 sm:py-3 order-2 sm:order-1"
             >
-              <MoveLeft /> {t("common.previous")}
+              <MoveLeft /> <span className="hidden sm:inline\">{t("common.previous")}</span>
             </button>
             <button
               onClick={handleNext}
               disabled={!isStep2Valid()}
-              className="flex cursor-pointer items-center gap-2 rounded-md bg-button-bg px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-md bg-button-bg px-6 sm:px-8 py-2 sm:py-3 text-xs sm:text-base font-semibold text-white hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
             >
               {t("common.next")} 2/3{" "}
               <span>
@@ -552,17 +552,17 @@ export default function DataEntryStep({
             </div>
           </div>
 
-          <div className="mt-8 flex justify-between">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-between">
             <button
               onClick={handlePrevSubStep}
-              className="flex cursor-pointer items-center gap-2 px-6 py-2 text-sm font-semibold text-button-bg transition-all hover:opacity-80 sm:py-3"
+              className="flex cursor-pointer items-center justify-center gap-2 px-6 py-2 text-xs sm:text-sm font-semibold text-button-bg transition-all hover:opacity-80 sm:py-3 order-2 sm:order-1\"
             >
-              <MoveLeft /> {t("common.previous")}
+              <MoveLeft /> <span className="hidden sm:inline\">{t("common.previous")}</span>
             </button>
             <button
               onClick={handleNext}
               disabled={!isStep3Valid()}
-              className="flex cursor-pointer items-center gap-2 rounded-md bg-button-bg px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-md bg-button-bg px-6 sm:px-8 py-2 sm:py-3 text-xs sm:text-base font-semibold text-white hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2\"
             >
               {t("common.next")} 3/3{" "}
               <span>

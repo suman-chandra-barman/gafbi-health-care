@@ -14,9 +14,7 @@ const ItemsProgress = ({ currentCount, maxCount }: ItemsProgressProps) => {
   return (
     <div className="bg-card rounded-xl p-4">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium text-primary">
-          {remainingItems} items left
-        </span>
+    
         <span className="text-xs text-tertiary">
           {currentCount}/{maxCount}
         </span>

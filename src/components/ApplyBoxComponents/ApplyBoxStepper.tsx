@@ -176,7 +176,7 @@ export default function ApplyBoxStepper() {
   return (
     <div className="min-h-screen w-full bg-[#d2d9df] pb-8 sm:pb-12">
       <header className="w-full border-b border-gray-200 bg-white">
-        <div className="mx-auto flex w-full max-w-full items-center justify-between gap-4 px-4 py-2.5 sm:px-6">
+        <div className="mx-auto flex w-full flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-2.5">
           <Link href="/" className="flex items-center gap-2.5">
             <Image
               src="/logo.png"
@@ -185,37 +185,38 @@ export default function ApplyBoxStepper() {
               height={36}
               priority
             />
-            <p className="text-[30px] font-semibold leading-none text-[#1e5a83]">
+            <p className="text-lg sm:text-[30px] font-semibold leading-none text-[#1e5a83]">
               {t("common.brand")}
             </p>
           </Link>
-          <p className="hidden text-center text-base font-semibold text-[#1e5a83] md:block">
+          <p className="hidden text-center text-xs sm:text-sm md:text-base font-semibold text-[#1e5a83] md:block">
             {t("apply.helpLine")}
             <span className="ml-1 text-[#9cbf4b]">030 / 555 785 042</span>
           </p>
-          <button className="rounded-md border border-[#1e5a83] px-3 py-1.5 text-sm font-semibold text-[#1e5a83] transition-colors hover:bg-[#eaf3fa]">
+          <button className="rounded-md border border-[#1e5a83] px-3 py-1.5 text-xs sm:text-sm font-semibold text-[#1e5a83] transition-colors hover:bg-[#eaf3fa] whitespace-nowrap">
             {t("apply.requestChange")}
           </button>
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-2/3 px-4 sm:px-6">
+      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
         <div className="mb-8 mt-8 flex w-full items-center overflow-x-auto pb-2 sm:mb-10">
-          <div className="flex w-full items-center px-5 md:px-8">
+          <div className="flex w-full items-center gap-1 px-2">
             {steps.map((step, index) => {
               const stepState = getStepState(step.id);
 
               return (
                 <React.Fragment key={step.id}>
                   <div
-                    className={`flex h-12 flex-1 items-center justify-center rounded-[5px] border px-3 text-base font-semibold transition-all ${
+                    className={`flex min-h-12 flex-1 flex-col items-center justify-center rounded-[5px] border px-2 py-2 text-xs sm:text-sm md:text-base font-semibold transition-all ${
                       stepState === "active"
                         ? "border-[#1e5a83] bg-[#1e5a83] text-white"
                         : "border-[#3d77a6] bg-white text-[#1e5a83]"
                     }`}
                   >
-                    <span>
-                      {step.id}. {step.label}
+                    <span className="flex items-center gap-1">
+                      <span className="text-xs sm:text-sm">{step.id}.</span>
+                      <span className="line-clamp-1">{step.label}</span>
                     </span>
                     {stepState === "completed" && (
                       <span className="ml-2 text-lg leading-none text-[#22b45e]">
@@ -256,8 +257,8 @@ export default function ApplyBoxStepper() {
         </div>
       </div>
 
-      <div className="mx-auto mt-6 block w-full max-w-295 px-4 md:hidden">
-        <p className="text-center text-base font-semibold text-[#1e5a83]">
+      <div className="mx-auto mt-6 w-full max-w-4xl px-4 md:hidden">
+        <p className="text-center text-sm sm:text-base font-semibold text-[#1e5a83]">
           {t("apply.helpLine")}
           <span className="ml-1 text-[#9cbf4b]">030 / 555 785 042</span>
         </p>

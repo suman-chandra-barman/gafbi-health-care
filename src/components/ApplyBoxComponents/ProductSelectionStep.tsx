@@ -175,12 +175,12 @@ export default function ProductSelectionStep({
 
   return (
     <div className="w-full">
-      <h2 className="mb-6 text-[42px] font-bold text-[#2f2f2f]">
+      <h2 className="mb-6 text-2xl sm:text-3xl md:text-4xl lg:text-[42px] font-bold text-[#2f2f2f]">
         {t("apply.chooseProducts")}
       </h2>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-[1fr_320px]">
+        <div className="grid grid-cols-1 gap-2 sm:gap-3 sm:col-span-2 md:col-span-2 md:grid-cols-2 lg:col-span-1 lg:grid-cols-3">
           {products.map((product) => {
             const selected = selectedProducts.find(
               (item) => item.id === product.id,
@@ -252,9 +252,9 @@ export default function ProductSelectionStep({
           })}
         </div>
 
-        <aside className="rounded-md border border-[#d9dee3] bg-[#f6f7f8]">
+        <aside className="rounded-md border border-[#d9dee3] bg-[#f6f7f8] md:col-span-1 lg:col-span-1">
           <div className="border-b border-[#dee3e8] px-4 py-4">
-            <h3 className="text-[34px] font-bold text-[#383d42]">
+            <h3 className="text-lg sm:text-2xl md:text-3xl lg:text-[34px] font-bold text-[#383d42]">
               {t("apply.myCareBox")}
             </h3>
             <div className="mt-3 h-3 overflow-hidden rounded-full bg-[#e0e5ea]">
@@ -268,7 +268,7 @@ export default function ProductSelectionStep({
             </p>
           </div>
 
-          <div className="max-h-90 space-y-3 overflow-y-auto px-4 py-4">
+          <div className="max-h-64 sm:max-h-80 md:max-h-96 lg:max-h-90 space-y-3 overflow-y-auto px-4 py-4">
             {selectedProductsWithImages.length === 0 ? (
               <p className="text-sm text-[#8b949e]">{t("apply.noItems")}</p>
             ) : (
@@ -283,10 +283,12 @@ export default function ProductSelectionStep({
                   />
 
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-[#3f444a]">
+                    <p className="truncate text-xs sm:text-sm font-medium text-[#3f444a]">
                       {product.name}
                     </p>
-                    <p className="text-xs text-[#9aa2aa]">{product.volume}</p>
+                    <p className="text-xs text-[#9aa2aa] truncate">
+                      {product.volume}
+                    </p>
                   </div>
 
                   <span className="flex items-center gap-1 text-sm text-[#59616a]">
@@ -325,10 +327,10 @@ export default function ProductSelectionStep({
           <div className="border-t border-[#dee3e8] px-4 py-4">
             <button
               onClick={handleContinue}
-              className="ml-auto flex w-full items-center cursor-pointer justify-center gap-2 rounded-md bg-[#1e5a83] px-4 py-2.5 text-base font-semibold text-white transition-opacity hover:opacity-90"
+              className="w-full flex items-center cursor-pointer justify-center gap-2 rounded-md bg-[#1e5a83] px-4 py-2.5 text-sm sm:text-base font-semibold text-white transition-opacity hover:opacity-90"
             >
               {t("apply.continue")}
-              <span className="text-base">▶</span>
+              <span className="text-sm sm:text-base">▶</span>
             </button>
           </div>
         </aside>
