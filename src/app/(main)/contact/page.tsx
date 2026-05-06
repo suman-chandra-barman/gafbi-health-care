@@ -2,10 +2,51 @@
 
 "use client";
 
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
+import { useSubmitContactMutation } from "@/redux/features/contacts/contactsApi";
 
 const ContactPage = () => {
   const { t } = useTranslation();
+  const [submitContact, { isLoading }] = useSubmitContactMutation();
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    telephone_number: "",
+    regarding: "",
+    news: "",
+  });
+
+  const handleChange = (field: keyof typeof formData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const response = await submitContact(formData).unwrap();
+
+      if (response?.success) {
+        toast.success(response.message || "Contact message submitted.");
+        setFormData({
+          first_name: "",
+          last_name: "",
+          email: "",
+          telephone_number: "",
+          regarding: "",
+          news: "",
+        });
+        return;
+      }
+
+      toast.error(response?.message || "Failed to submit contact message.");
+    } catch (error) {
+      toast.error("Failed to submit contact message.");
+    }
+  };
 
   return (
     <main className="min-h-screen bg-[var(--color-card-bg)] px-4 pb-12 pt-3 sm:px-6 lg:px-8">
@@ -51,44 +92,70 @@ const ContactPage = () => {
             </div>
           </div>
 
-          <form className="rounded-md bg-white p-4 sm:p-6 lg:p-8">
+          <form
+            className="rounded-md bg-white p-4 sm:p-6 lg:p-8"
+            onSubmit={handleSubmit}
+          >
             <h2 className="mb-4 text-2xl md:text-3xl xl:text-4xl font-semibold text-[var(--color-button-bg)]">
               {t("contactPage.getInTouch")}
             </h2>
 
             <div className="grid gap-3 sm:grid-cols-2">
               <input
+                value={formData.first_name}
+                onChange={(e) => handleChange("first_name", e.target.value)}
                 className="rounded-md border border-slate-200 px-4 py-3 text-sm"
                 placeholder={t("contactPage.firstName")}
+                required
               />
               <input
+                value={formData.last_name}
+                onChange={(e) => handleChange("last_name", e.target.value)}
                 className="rounded-md border border-slate-200 px-4 py-3 text-sm"
                 placeholder={t("contactPage.lastName")}
+                required
               />
               <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleChange("email", e.target.value)}
                 className="rounded-md border border-slate-200 px-4 py-3 text-sm"
                 placeholder={t("contactPage.email")}
+                required
               />
               <input
+                type="tel"
+                value={formData.telephone_number}
+                onChange={(e) =>
+                  handleChange("telephone_number", e.target.value)
+                }
                 className="rounded-md border border-slate-200 px-4 py-3 text-sm"
                 placeholder={t("contactPage.phone")}
+                required
               />
             </div>
 
             <input
+              value={formData.regarding}
+              onChange={(e) => handleChange("regarding", e.target.value)}
               className="mt-3 w-full rounded-md border border-slate-200 px-4 py-3 text-sm"
               placeholder={t("contactPage.regarding")}
+              required
             />
             <textarea
+              value={formData.news}
+              onChange={(e) => handleChange("news", e.target.value)}
               className="mt-3 h-28 w-full rounded-md border border-slate-200 px-4 py-3 text-sm"
               placeholder={t("contactPage.news")}
+              required
             />
 
             <button
-              type="button"
+              type="submit"
               className="mt-4 cursor-pointer rounded-md bg-[var(--color-button-bg)] px-6 py-1 text-lg font-semibold text-white"
+              disabled={isLoading}
             >
-              {t("common.submit")}
+              {isLoading ? "Submitting..." : t("common.submit")}
             </button>
           </form>
         </section>
