@@ -86,7 +86,7 @@ const resources = {
       productsPage: {
         title: "Our Products",
         breadcrumbLabel: "Our products",
-        bookingRequest: "Booking request +",
+        goToCarebox: "Go to Carebox",
         productDetails: "Product details",
         descriptionTab: "Description",
         reviewsTab: "Reviews & ratings",
@@ -231,7 +231,7 @@ const resources = {
       productsPage: {
         title: "Unsere Produkte",
         breadcrumbLabel: "Unsere Produkte",
-        bookingRequest: "Buchungsanfrage +",
+        goToCarebox: "Zur Pflegebox gehen",
         productDetails: "Produktdetails",
         descriptionTab: "Beschreibung",
         reviewsTab: "Bewertungen",
