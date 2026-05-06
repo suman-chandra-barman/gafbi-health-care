@@ -3,6 +3,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
 const findUsLinks = ["Facebook", "Instagram", "LinkedIn", "Youtube"];
@@ -11,16 +12,14 @@ export default function Footer() {
   const { t } = useTranslation();
 
   const quickLinks = [
-    t("infoNav.applyBox"),
-    t("infoNav.emergencySupport"),
-    t("apply.application"),
-    t("apply.dataEntry"),
+    { label: t("infoNav.applyBox"), href: "/apply-box" },
+    { label: t("infoNav.emergencySupport"), href: "/contact" },
   ];
 
   const companyLinks = [
-    t("common.faqs"),
-    t("common.contact"),
-    t("nav.aboutUs"),
+    { label: t("common.contact"), href: "/contact" },
+    { label: t("common.faqs"), href: "/faqs" },
+    { label: t("common.products"), href: "/products" },
   ];
 
   return (
@@ -57,7 +56,10 @@ export default function Footer() {
             <button
               type="button"
               aria-label="Back to top"
-              className="mt-1 cursor-pointer flex h-10 w-10 items-center justify-center rounded-full border border-[#c8cdd3] text-[18px] text-[#4f5760]"
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              className="mt-1 cursor-pointer flex h-10 w-10 items-center justify-center rounded-full border border-[#1f5f8f] hover:bg-[#dae7f1] text-[18px] text-[#4f5760]"
             >
               ↑
             </button>
@@ -70,13 +72,13 @@ export default function Footer() {
               </h3>
               <ul className="mt-4 space-y-2">
                 {quickLinks.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
                       className="text-xs md:text-sm text-[#1f5f8f] underline"
                     >
-                      {link}
-                    </a>
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -88,22 +90,16 @@ export default function Footer() {
               </h3>
               <ul className="mt-4 space-y-2">
                 {companyLinks.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
                       className="text-xs md:text-sm text-[#1f5f8f] underline"
                     >
-                      {link}
-                    </a>
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
-              <button
-                type="button"
-                className="mt-5 cursor-pointer rounded-md bg-[#c40019] px-4 py-2 text-[18px] font-semibold text-white"
-              >
-                Cancel Gafbi care box
-              </button>
             </div>
 
             <div>

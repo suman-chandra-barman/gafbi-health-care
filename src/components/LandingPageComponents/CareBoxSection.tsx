@@ -65,7 +65,7 @@ export default function CareBoxSection() {
           </Link>
         </div>
 
-        <div className="my-8 md:my-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 max-w-300 mx-auto hover:cursor-pointer">
+        <div className="my-8 md:my-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 max-w-300 mx-auto">
           {careBoxFeatures.map((feature) => (
             <article
               key={feature.title}
