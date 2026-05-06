@@ -11,7 +11,7 @@ export default function AboutSection() {
   return (
     <section className="w-full  px-4 py-12 sm:px-6 lg:px-8 lg:py-16 ">
       <div className="mx-auto relative w-full max-w-625 overflow-hidden rounded-[18px] bg-[#628db4] py-8 sm:py-12 md:py-16">
-        <div className="absolute right-0 top-0 h-70 w-full md:h-120 md:w-[48%]">
+        <div className="absolute right-0 top-0 h-70 w-full md:h-119 md:w-[48%]">
           <Image
             src="/about-banner.jpg"
             alt="Healthcare team"
@@ -53,13 +53,6 @@ export default function AboutSection() {
             <br />
             With us, you are the focus - with a service you can always rely on.
           </p>
-
-          <button
-            type="button"
-            className="mt-6 cursor-pointer rounded-md border border-[#1f5f8f] px-4 py-2 text-sm font-semibold text-[#1f5f8f] sm:text-lg"
-          >
-            {t("landing.aboutMore")}
-          </button>
         </article>
       </div>
     </section>

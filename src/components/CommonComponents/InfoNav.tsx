@@ -4,7 +4,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import i18n, { AppLanguage, languageStorageKey } from "@/lib/i18n";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -12,8 +12,11 @@ import { logout, selectCurrentUser } from "@/redux/features/auth/authSlice";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
+const HIDDEN_ROUTES = ["/apply-box"];
+
 export default function InfoNav() {
   const { t } = useTranslation();
+  const pathname = usePathname();
   const [language, setLanguage] = useState<AppLanguage>(
     (i18n.language as AppLanguage) || "en",
   );
@@ -22,6 +25,8 @@ export default function InfoNav() {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectCurrentUser);
   const displayName = user?.email_address?.split("@")[0] || "Profile";
+
+  if (HIDDEN_ROUTES.includes(pathname)) return null;
 
   const applyLanguage = (targetLanguage: AppLanguage) => {
     setLanguage(targetLanguage);
@@ -40,12 +45,14 @@ export default function InfoNav() {
 
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-              <button
-                type="button"
-                className="w-full rounded-xl cursor-pointer border border-[#1b4f75] px-4 py-2 text-sm font-semibold text-[#1b4f75] sm:w-auto"
-              >
-                {t("infoNav.emergencySupport")}
-              </button>
+              <Link href="/contact" className="w-full sm:w-auto">
+                <button
+                  type="button"
+                  className="w-full rounded-xl cursor-pointer border border-[#1b4f75] px-4 py-2 text-sm font-semibold text-[#1b4f75] sm:w-auto"
+                >
+                  {t("infoNav.emergencySupport")}
+                </button>
+              </Link>
               <Link href="/apply-box" className="w-full sm:w-auto">
                 <button
                   type="button"

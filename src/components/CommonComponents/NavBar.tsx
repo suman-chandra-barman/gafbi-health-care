@@ -7,13 +7,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 
+const HIDDEN_ROUTES = ["/apply-box"];
+
 export default function NavBar() {
   const { t } = useTranslation();
   const pathname = usePathname();
 
+  if (HIDDEN_ROUTES.includes(pathname)) return null;
+
   const navItems = [
-    { label: t("nav.aboutUs"), href: "/#about" },
-    { label: t("nav.careBox"), href: "/#carebox" },
+    { label: t("nav.careBox"), href: "/apply-box" },
     { label: t("common.products"), href: "/products" },
     { label: t("common.contact"), href: "/contact" },
     { label: t("common.faqs"), href: "/faqs" },
