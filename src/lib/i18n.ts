@@ -1,12 +1,13 @@
 /** @format */
-
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
 export const supportedLanguages = ["en", "de"] as const;
 export type AppLanguage = (typeof supportedLanguages)[number];
-
 export const languageStorageKey = "gafbi-language";
+
+// Local storage থেকে ভাষা চেক করা (যদি থাকে)
+const savedLanguage = typeof window !== "undefined" ? localStorage.getItem(languageStorageKey) : "en";
 
 const resources = {
   en: {
@@ -24,8 +25,7 @@ const resources = {
         done: "Done",
       },
       infoNav: {
-        freeConsultation:
-          "FREE consultation: 030 555 7850 65, Mon-Fri: 8:00-16:00",
+        freeConsultation: "FREE consultation: 030 555 7850 65, Mon-Fri: 8:00-16:00",
         emergencySupport: "Apply for emergency call support",
         applyBox: "Apply for a box",
         signIn: "Sign in",
@@ -39,22 +39,18 @@ const resources = {
       },
       hero: {
         title: "Gafbi Care Box - Simple solutions for your care supply needs",
-        subtitle:
-          "Home care supplies - reliable, tailored to your needs, and delivered directly to you. We support families throughout Germany with home care.",
+        subtitle: "Home care supplies - reliable, tailored to your needs, and delivered directly to you. We support families throughout Germany with home care.",
         applyNow: "Apply for a new care box now",
       },
       landing: {
         servicesTitle: "Our Services",
         productsTitle: "Trusted care products from Gafbi",
         addToBox: "+ Add to box",
-        aboutTitle:
-          "We supply families throughout Germany with high-quality, consumable care supplies",
-        aboutDescription:
-          "As a Schulke & Mayr company, we work to the highest standards - for quality you can trust.",
+        aboutTitle: "We supply families throughout Germany with high-quality, consumable care supplies",
+        aboutDescription: "As a Schulke & Mayr company, we work to the highest standards - for quality you can trust.",
         aboutMore: "More about us",
         careTitle: "Free care aids from #care level 1",
-        careDescription:
-          "Receive high-quality care products completely free of charge through your long-term care insurance. Customize your personal Care Box with essential daily aids and have it delivered quickly and easily to your home.",
+        careDescription: "Receive high-quality care products completely free of charge through your long-term care insurance. Customize your personal Care Box with essential daily aids and have it delivered quickly and easily to your home.",
         careApply: "Apply for a care box now",
         clientsTitle: "Don't take our word for it, see what our clients say",
         clientsExcellent: "Excellent",
@@ -74,8 +70,7 @@ const resources = {
       contactPage: {
         details: "Contact details",
         heading: "Unleash your potential with tailor made solutions",
-        description:
-          "Contact us at our office, by phone or email for fast and uncomplicated support.",
+        description: "Contact us at our office, by phone or email for fast and uncomplicated support.",
         getInTouch: "Get in touch",
         firstName: "First Name",
         lastName: "Last Name",
@@ -101,21 +96,18 @@ const resources = {
       },
       auth: {
         loginManage: "Log in & manage Gafbi-Box",
-        loginDescription:
-          "To manage the contents of your Gafbi box and your delivery, please use our customer portal.",
+        loginDescription: "To manage the contents of your Gafbi box and your delivery, please use our customer portal.",
         forgotPassword: "Forgot password?",
         login: "Log in",
         signingIn: "Signing in...",
         createAccount: "Create a new account",
         registerTitle: "Create an account",
-        registerDescription:
-          "What e-mail address did you provide when you ordered a Gafbi Box?",
+        registerDescription: "What e-mail address did you provide when you ordered a Gafbi Box?",
         create: "Create",
         creating: "Creating...",
         backToLogin: "Back to login page",
         forgotTitle: "Forgot Password",
-        forgotDescription:
-          "Enter your email to receive a 6-digit OTP for password reset.",
+        forgotDescription: "Enter your email to receive a 6-digit OTP for password reset.",
         sendOtp: "Send OTP",
         sending: "Sending...",
         verifyTitle: "Verify OTP",
@@ -158,8 +150,7 @@ const resources = {
         noItems: "No items selected yet",
         continue: "Continue",
         appSubmitted: "Application submitted successfully",
-        appSubmittedDesc:
-          "Thank you. Your application has been received and will be processed shortly.",
+        appSubmittedDesc: "Thank you. Your application has been received and will be processed shortly.",
         startNew: "Start a new application",
       },
     },
@@ -172,16 +163,15 @@ const resources = {
         products: "Produkte",
         contact: "Kontakt",
         faqs: "FAQs",
-        submit: "Senden",
+        submit: "Absenden",
         details: "Details",
-        previous: "Zuruck",
+        previous: "Zurück",
         next: "Weiter",
         done: "Fertig",
       },
       infoNav: {
-        freeConsultation:
-          "KOSTENLOSE Beratung: 030 555 7850 65, Mo-Fr: 8:00-16:00",
-        emergencySupport: "Hausnotruf-Unterstutzung beantragen",
+        freeConsultation: "KOSTENLOSE Beratung: 030 555 7850 65, Mo-Fr: 8:00-16:00",
+        emergencySupport: "Hausnotruf-Unterstützung beantragen",
         applyBox: "Pflegebox beantragen",
         signIn: "Anmelden",
         account: "Konto",
@@ -189,38 +179,32 @@ const resources = {
         logout: "Abmelden",
       },
       nav: {
-        aboutUs: "Uber uns",
+        aboutUs: "Über uns",
         careBox: "Pflegebox",
       },
       hero: {
-        title: "Gafbi Pflegebox - Einfache Losungen fur Ihren Pflegebedarf",
-        subtitle:
-          "Pflegehilfsmittel fur zu Hause - zuverlassig, bedarfsgerecht und direkt zu Ihnen geliefert. Wir unterstutzen Familien in ganz Deutschland.",
+        title: "Gafbi Pflegebox - Einfache Lösungen für Ihren Pflegebedarf",
+        subtitle: "Pflegehilfsmittel für zu Hause – zuverlässig, bedarfsgerecht und direkt zu Ihnen geliefert. Wir unterstützen Familien in ganz Deutschland.",
         applyNow: "Jetzt neue Pflegebox beantragen",
       },
       landing: {
         servicesTitle: "Unsere Leistungen",
-        productsTitle: "Bewahrte Pflegeprodukte von Gafbi",
-        addToBox: "+ Zur Box hinzufugen",
-        aboutTitle:
-          "Wir versorgen Familien in ganz Deutschland mit hochwertigen Pflegeverbrauchsmaterialien",
-        aboutDescription:
-          "Als Unternehmen der Schulke & Mayr Gruppe arbeiten wir nach hochsten Standards - fur Qualitat, der Sie vertrauen konnen.",
-        aboutMore: "Mehr uber uns",
+        productsTitle: "Bewährte Pflegeprodukte von Gafbi",
+        addToBox: "+ Zur Box hinzufügen",
+        aboutTitle: "Wir versorgen Familien in ganz Deutschland mit hochwertigen Pflegeverbrauchsmaterialien",
+        aboutDescription: "Als Unternehmen der Schülke & Mayr Gruppe arbeiten wir nach höchsten Standards – für Qualität, der Sie vertrauen können.",
+        aboutMore: "Mehr über uns",
         careTitle: "Kostenlose Pflegehilfsmittel ab Pflegegrad 1",
-        careDescription:
-          "Erhalten Sie hochwertige Pflegeprodukte vollig kostenlos uber Ihre Pflegeversicherung. Stellen Sie Ihre personliche Pflegebox mit den wichtigsten Alltagshilfen zusammen und lassen Sie sie schnell und einfach nach Hause liefern.",
+        careDescription: "Erhalten Sie hochwertige Pflegeprodukte völlig kostenlos über Ihre Pflegeversicherung. Stellen Sie Ihre persönliche Pflegebox mit den wichtigsten Alltagshilfen zusammen und lassen Sie sie schnell und einfach nach Hause liefern.",
         careApply: "Jetzt Pflegebox beantragen",
-        clientsTitle:
-          "Verlassen Sie sich nicht nur auf unser Wort - sehen Sie, was unsere Kunden sagen",
+        clientsTitle: "Verlassen Sie sich nicht nur auf unser Wort – sehen Sie, was unsere Kunden sagen",
         clientsExcellent: "Ausgezeichnet",
         clientsRatings: "4,7 Bewertungen basierend auf 3.219 Kunden",
       },
       footer: {
-        newsletter:
-          "Bleiben Sie mit unseren neuesten Angeboten auf dem Laufenden",
+        newsletter: "Bleiben Sie mit unseren neuesten Angeboten auf dem Laufenden",
         subscribePlaceholder: "E-Mail zum Abonnieren eingeben",
-        quickLinks: "Schnellzugriffe",
+        quickLinks: "Quick-Links",
         company: "Unternehmen",
         findUs: "Finden Sie uns",
         rights: "2026 @Gafbi - Alle Rechte vorbehalten",
@@ -230,9 +214,8 @@ const resources = {
       },
       contactPage: {
         details: "Kontaktinformationen",
-        heading: "Entfalten Sie Ihr Potenzial mit maBgeschneiderten Losungen",
-        description:
-          "Kontaktieren Sie uns im Buro, per Telefon oder E-Mail fur schnelle und unkomplizierte Unterstutzung.",
+        heading: "Entfalten Sie Ihr Potenzial mit maßgeschneiderten Lösungen",
+        description: "Kontaktieren Sie uns im Büro, per Telefon oder E-Mail für schnelle und unkomplizierte Unterstützung.",
         getInTouch: "Kontakt aufnehmen",
         firstName: "Vorname",
         lastName: "Nachname",
@@ -243,7 +226,7 @@ const resources = {
       },
       faqPage: {
         details: "FAQ-Details",
-        heading: "Haufig gestellte Fragen zur Gafbi Pflegebox",
+        heading: "Häufig gestellte Fragen zur Gafbi Pflegebox",
       },
       productsPage: {
         title: "Unsere Produkte",
@@ -258,51 +241,46 @@ const resources = {
       },
       auth: {
         loginManage: "Anmelden & Gafbi-Box verwalten",
-        loginDescription:
-          "Um den Inhalt Ihrer Gafbi-Box und Ihre Lieferung zu verwalten, nutzen Sie bitte unser Kundenportal.",
+        loginDescription: "Um den Inhalt Ihrer Gafbi-Box und Ihre Lieferung zu verwalten, nutzen Sie bitte unser Kundenportal.",
         forgotPassword: "Passwort vergessen?",
         login: "Anmelden",
-        signingIn: "Anmeldung...",
+        signingIn: "Anmeldung läuft...",
         createAccount: "Neues Konto erstellen",
         registerTitle: "Konto erstellen",
-        registerDescription:
-          "Welche E-Mail-Adresse haben Sie bei der Bestellung Ihrer Gafbi-Box angegeben?",
+        registerDescription: "Welche E-Mail-Adresse haben Sie bei der Bestellung Ihrer Gafbi-Box angegeben?",
         create: "Erstellen",
         creating: "Wird erstellt...",
-        backToLogin: "Zuruck zur Anmeldung",
+        backToLogin: "Zurück zur Anmeldung",
         forgotTitle: "Passwort vergessen",
-        forgotDescription:
-          "Geben Sie Ihre E-Mail ein, um einen 6-stelligen OTP fur das Zurucksetzen zu erhalten.",
-        sendOtp: "OTP senden",
+        forgotDescription: "Geben Sie Ihre E-Mail ein, um einen 6-stelligen Code (OTP) zum Zurücksetzen zu erhalten.",
+        sendOtp: "Code senden",
         sending: "Wird gesendet...",
-        verifyTitle: "OTP verifizieren",
-        verifyDescription:
-          "Geben Sie den 6-stelligen OTP aus Ihrer E-Mail ein.",
+        verifyTitle: "Code verifizieren",
+        verifyDescription: "Geben Sie den 6-stelligen Code aus Ihrer E-Mail ein.",
         verify: "Verifizieren",
         verifying: "Wird verifiziert...",
-        resetTitle: "Passwort zurucksetzen",
-        resetDescription: "Legen Sie ein neues Passwort fur Ihr Konto fest.",
-        reset: "Passwort zurucksetzen",
-        resetting: "Wird zuruckgesetzt...",
-        termsAgreementPrefix:
-          "Mit der Kontoerstellung stimmen Sie unseren folgenden Bedingungen zu",
+        resetTitle: "Passwort zurücksetzen",
+        resetDescription: "Legen Sie ein neues Passwort für Ihr Konto fest.",
+        reset: "Passwort zurücksetzen",
+        resetting: "Wird zurückgesetzt...",
+        termsAgreementPrefix: "Mit der Kontoerstellung stimmen Sie unseren Bedingungen zu",
       },
       toasts: {
         signedIn: "Erfolgreich angemeldet!",
-        acceptTerms: "Sie mussen den AGB zustimmen.",
-        accountCreated: "Konto erstellt! Bitte OTP verifizieren.",
-        otpSent: "OTP wurde an Ihre E-Mail gesendet",
-        otpRequired: "Bitte geben Sie den 6-stelligen OTP ein",
-        otpVerified: "OTP verifiziert!",
-        passwordReset: "Passwort erfolgreich zuruckgesetzt!",
+        acceptTerms: "Sie müssen den AGB zustimmen.",
+        accountCreated: "Konto erstellt! Bitte verifizieren Sie den Code.",
+        otpSent: "Der Code wurde an Ihre E-Mail gesendet",
+        otpRequired: "Bitte geben Sie den 6-stelligen Code ein",
+        otpVerified: "Code verifiziert!",
+        passwordReset: "Passwort erfolgreich zurückgesetzt!",
       },
       terms: {
-        title: "Allgemeine Geschaftsbedingungen",
+        title: "Allgemeine Geschäftsbedingungen (AGB)",
         introHeading: "Willkommen bei Gafbi Health Care!",
         q1: "1. Lizenz",
         q2: "2. Verantwortlichkeiten der Nutzer",
         q3: "3. Datenschutz",
-        q4: "4. Anderungen der Bedingungen",
+        q4: "4. Änderungen der Bedingungen",
       },
       apply: {
         productSelection: "Produktauswahl",
@@ -310,15 +288,14 @@ const resources = {
         application: "Antrag",
         done: "Fertig",
         helpLine: "Bei Fragen zu Ihrem Antrag rufen Sie bitte an:",
-        requestChange: "Anderung der Pflegebox anfragen",
-        chooseProducts: "Wahlen Sie Ihre Produkte",
+        requestChange: "Änderung der Pflegebox anfragen",
+        chooseProducts: "Wählen Sie Ihre Produkte",
         myCareBox: "Meine Pflegebox",
-        itemsLeft: "{{count}} Artikel ubrig",
-        noItems: "Noch keine Artikel ausgewahlt",
+        itemsLeft: "Noch {{count}} Artikel übrig",
+        noItems: "Noch keine Artikel ausgewählt",
         continue: "Weiter",
-        appSubmitted: "Antrag erfolgreich ubermittelt",
-        appSubmittedDesc:
-          "Vielen Dank. Ihr Antrag ist eingegangen und wird in Kurze bearbeitet.",
+        appSubmitted: "Antrag erfolgreich übermittelt",
+        appSubmittedDesc: "Vielen Dank. Ihr Antrag ist eingegangen und wird in Kürze bearbeitet.",
         startNew: "Neuen Antrag starten",
       },
     },
@@ -328,12 +305,19 @@ const resources = {
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
     resources,
-    lng: "en",
+    lng: savedLanguage || "en",
     fallbackLng: "en",
     interpolation: {
       escapeValue: false,
     },
   });
 }
+
+// ভাষা পরিবর্তন হলে তা স্টোরেজ এ সেভ করার জন্য
+i18n.on('languageChanged', (lng) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(languageStorageKey, lng);
+  }
+});
 
 export default i18n;
