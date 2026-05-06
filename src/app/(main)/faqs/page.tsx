@@ -6,46 +6,17 @@ import Image from "next/image";
 import { Plus, Minus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-
-const faqs = [
-  {
-    question: "Was ist die Gafbi Pflegebox?",
-    answer:
-      "Die Gafbi Pflegebox ist ein monatliches, individuell anpassbares Paket mit Pflegehilfsmitteln zum Verbrauch (z. B. Einmalhandschuhe, Desinfektionstucher, Flachendesinfektion, Bettschutzeinlagen, Mundschutz und FFP2-Masken). Es wird kostenfrei geliefert (ab Pflegegrad 1), Gafbi ubernimmt die komplette Abrechnung mit Ihrer Pflegekasse. Zusatzlich sind oft ein wiederverwendbarer Bettschutz und ein Hausnotruf enthalten.",
-  },
-  {
-    question: "Wer hat Anspruch auf die Gafbi Pflegebox?",
-    answer:
-      "Anspruch haben in der Regel Personen mit anerkanntem Pflegegrad, die zu Hause versorgt werden. Die Kosten werden uber die Pflegekasse bis zum gesetzlichen Rahmen ubernommen.",
-  },
-  {
-    question: "Welche Produkte sind in der Pflegebox enthalten?",
-    answer:
-      "Typischerweise enthalt die Box Verbrauchsprodukte wie Einmalhandschuhe, Desinfektionsmittel, Bettschutzeinlagen, Mundschutz und weitere alltagstaugliche Pflegehilfsmittel.",
-  },
-  {
-    question: "Wie funktioniert die Lieferung?",
-    answer:
-      "Die Pflegebox wird monatlich direkt an die angegebene Adresse geliefert. Sie konnen die Inhalte anpassen und erhalten die Lieferung regelmassig ohne manuellen Aufwand.",
-  },
-  {
-    question: "Kann ich die Inhalte der Box individuell anpassen?",
-    answer:
-      "Ja, die Zusammenstellung kann anhand Ihres Bedarfs geandert werden. So erhalten Sie nur die Produkte, die fur Ihre tagliche Pflege sinnvoll sind.",
-  },
-  {
-    question: "Wie beantrage ich die Gafbi Pflegebox?",
-    answer:
-      "Sie konnen die Pflegebox uber das Kontaktformular oder telefonisch anfragen. Das Team unterstutzt Sie bei den notwendigen Angaben und der Abrechnung mit der Pflegekasse.",
-  },
-];
+import { useGetFaqsQuery } from "@/redux/features/faqs/faqsApi";
+import FaqsSkeleton from "@/components/CommonComponents/FaqsSkeleton";
 
 const FaqsPage = () => {
   const { t } = useTranslation();
-  const [openIndex, setOpenIndex] = useState(0);
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const { data, isLoading, isError } = useGetFaqsQuery({ page: 1, limit: 10 });
+  const faqs = data?.data ?? [];
 
   const toggleItem = (index: number) => {
-    setOpenIndex((prev) => (prev === index ? -1 : index));
+    setOpenIndex((prev) => (prev === index ? null : index));
   };
 
   return (
@@ -76,12 +47,26 @@ const FaqsPage = () => {
           </div>
 
           <div className="space-y-3">
+            {isLoading ? <FaqsSkeleton /> : null}
+
+            {isError ? (
+              <div className="rounded-md bg-[var(--color-card-bg)] p-4 text-secondary">
+                Failed to load FAQs.
+              </div>
+            ) : null}
+
+            {!isLoading && !isError && faqs.length === 0 ? (
+              <div className="rounded-md bg-[var(--color-card-bg)] p-4 text-secondary">
+                No FAQs available.
+              </div>
+            ) : null}
+
             {faqs.map((faq, index) => {
               const isOpen = openIndex === index;
 
               return (
                 <article
-                  key={faq.question}
+                  key={faq.id}
                   className="rounded-md bg-[var(--color-card-bg)] p-4"
                 >
                   <button
