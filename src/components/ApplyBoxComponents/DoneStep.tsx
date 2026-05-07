@@ -5,23 +5,55 @@
 import Image from "next/image";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
+import { useSubmitCareBoxFeedbackMutation } from "@/redux/features/careBox/careBoxApi";
 
 interface DoneStepProps {
+  applicationId: number | null;
   onComplete: () => void;
 }
 
-export default function DoneStep({ onComplete }: DoneStepProps) {
+export default function DoneStep({ applicationId, onComplete }: DoneStepProps) {
   const { t } = useTranslation();
   const [currentSubStep, setCurrentSubStep] = useState(1);
   const [satisfaction, setSatisfaction] = useState("");
   const [informationSatisfaction, setInformationSatisfaction] = useState("");
+  const [submitFeedback, { isLoading: isSubmittingFeedback }] =
+    useSubmitCareBoxFeedbackMutation();
 
-  const handleContinue = () => {
+  const mapSatisfaction = (value: string) => {
+    if (value === "Very satisfied") return "very_satisfied";
+    if (value === "Satisfied") return "satisfied";
+    if (value === "Ok") return "ok";
+    if (value === "Dissatisfied") return "dissatisfied";
+    return "very_dissatisfied";
+  };
+
+  const handleContinue = async () => {
     if (currentSubStep === 1) {
       setCurrentSubStep(2);
     } else if (currentSubStep === 2 && satisfaction) {
       setCurrentSubStep(3);
     } else if (currentSubStep === 3 && informationSatisfaction) {
+      if (!applicationId) {
+        toast("Application ID not found. Please submit again.");
+        return;
+      }
+
+      try {
+        const response = await submitFeedback({
+          application: applicationId,
+          satisfaction: mapSatisfaction(satisfaction),
+          information_helpful: informationSatisfaction === "Yes",
+        }).unwrap();
+
+        toast(response.message || "Feedback submitted successfully");
+      } catch (error) {
+        console.error(error);
+        toast("Failed to submit feedback");
+        return;
+      }
+
       onComplete();
     }
   };
@@ -172,7 +204,7 @@ export default function DoneStep({ onComplete }: DoneStepProps) {
             disabled={!informationSatisfaction}
             className="rounded-md cursor-pointer bg-button-bg px-8 py-2  text-sm sm:text-base font-semibold text-white hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {t("common.done")}
+            {isSubmittingFeedback ? "Submitting..." : t("common.done")}
           </button>
         </div>
       )}

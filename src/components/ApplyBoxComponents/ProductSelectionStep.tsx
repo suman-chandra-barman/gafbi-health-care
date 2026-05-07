@@ -2,96 +2,25 @@
 
 "use client";
 
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { LuShoppingBag } from "react-icons/lu";
 import { PiTrashSimple } from "react-icons/pi";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
+import { useGetCareBoxProductsQuery } from "@/redux/features/careBox/careBoxApi";
 
-const MAX_ITEMS = 6;
-
-const products = [
-  {
-    id: "1",
-    name: "Surface Disinfectant",
-    volume: "500 ml",
-    price: 12.99,
-    image: "/antifect.png",
-  },
-  {
-    id: "2",
-    name: "Surface Disinfectant",
-    volume: "500 ml",
-    price: 12.99,
-    image: "/antifect.png",
-  },
-  {
-    id: "3",
-    name: "Surface Disinfectant",
-    volume: "500 ml",
-    price: 12.99,
-    image: "/antifect.png",
-  },
-  {
-    id: "4",
-    name: "Surface Disinfectant",
-    volume: "500 ml",
-    price: 12.99,
-    image: "/antifect.png",
-  },
-  {
-    id: "5",
-    name: "Surface Disinfectant",
-    volume: "500 ml",
-    price: 12.99,
-    image: "/antifect.png",
-  },
-  {
-    id: "6",
-    name: "Surface Disinfectant",
-    volume: "500 ml",
-    price: 12.99,
-    image: "/antifect.png",
-  },
-  {
-    id: "7",
-    name: "Surface Disinfectant",
-    volume: "500 ml",
-    price: 12.99,
-    image: "/antifect.png",
-  },
-  {
-    id: "8",
-    name: "Surface Disinfectant",
-    volume: "500 ml",
-    price: 12.99,
-    image: "/antifect.png",
-  },
-  {
-    id: "9",
-    name: "Surface Disinfectant",
-    volume: "500 ml",
-    price: 12.99,
-    image: "/antifect.png",
-  },
-  {
-    id: "10",
-    name: "Surface Disinfectant",
-    volume: "500 ml",
-    price: 12.99,
-    image: "/antifect.png",
-  },
-];
+const MAX_BUDGET = 42;
 
 interface ProductSelectionStepProps {
   data: Array<{
-    id: string;
+    id: number;
     name: string;
     quantity: number;
     volume: string;
-    price?: number;
+    price: number;
+    imageUrl?: string;
   }>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onNext: (data: any) => void;
@@ -102,32 +31,48 @@ export default function ProductSelectionStep({
   onNext,
 }: ProductSelectionStepProps) {
   const { t } = useTranslation();
+  const {
+    data: productsResponse,
+    isLoading,
+    isError,
+  } = useGetCareBoxProductsQuery();
   const [selectedProducts, setSelectedProducts] = useState(
     data.length > 0 ? data : [],
   );
 
-  const totalItems = selectedProducts.reduce((sum, p) => sum + p.quantity, 0);
-  const itemsLeft = Math.max(0, MAX_ITEMS - totalItems);
+  const products = productsResponse?.data ?? [];
+  const totalPrice = selectedProducts.reduce(
+    (sum, p) => sum + p.quantity * p.price,
+    0,
+  );
 
   const selectedProductsWithImages = useMemo(() => {
     return selectedProducts.map((selectedProduct) => ({
       ...selectedProduct,
       image:
-        products.find((product) => product.id === selectedProduct.id)?.image ||
+        selectedProduct.imageUrl ||
+        products.find((product) => product.id === selectedProduct.id)
+          ?.image_url ||
         "/antifect.png",
     }));
-  }, [selectedProducts]);
+  }, [products, selectedProducts]);
 
-  const updateProductQuantity = (productId: string, nextQuantity: number) => {
+  const updateProductQuantity = (productId: number, nextQuantity: number) => {
     if (nextQuantity < 0) return;
 
     const existing = selectedProducts.find(
       (product) => product.id === productId,
     );
     const currentQty = existing?.quantity || 0;
-    const projectedTotal = totalItems - currentQty + nextQuantity;
+    const sourceProduct = products.find((product) => product.id === productId);
+    if (!sourceProduct) return;
 
-    if (projectedTotal > MAX_ITEMS) {
+    const price = Number(sourceProduct.price || 0);
+    const projectedTotalPrice =
+      totalPrice - currentQty * price + nextQuantity * price;
+
+    if (projectedTotalPrice > MAX_BUDGET) {
+      toast("Maximum budget is $42");
       return;
     }
 
@@ -137,9 +82,6 @@ export default function ProductSelectionStep({
       );
       return;
     }
-
-    const sourceProduct = products.find((product) => product.id === productId);
-    if (!sourceProduct) return;
 
     if (existing) {
       setSelectedProducts((prev) =>
@@ -157,9 +99,10 @@ export default function ProductSelectionStep({
       {
         id: sourceProduct.id,
         name: sourceProduct.name,
-        volume: sourceProduct.volume,
+        volume: sourceProduct.quantity_with_unit,
         quantity: nextQuantity,
-        price: sourceProduct.price,
+        price,
+        imageUrl: sourceProduct.image_url,
       },
     ]);
   };
@@ -179,6 +122,15 @@ export default function ProductSelectionStep({
         {t("apply.chooseProducts")}
       </h2>
 
+      {isLoading && (
+        <p className="mb-4 text-sm text-secondary">Loading products...</p>
+      )}
+      {isError && (
+        <p className="mb-4 text-sm text-red-500">
+          Failed to load products. Please try again.
+        </p>
+      )}
+
       <div className="grid gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-[1fr_320px]">
         <div className="grid grid-cols-1 gap-2 sm:gap-3 sm:col-span-2 md:col-span-2 md:grid-cols-2 lg:col-span-1 lg:grid-cols-3">
           {products.map((product) => {
@@ -186,15 +138,18 @@ export default function ProductSelectionStep({
               (item) => item.id === product.id,
             );
             const quantity = selected?.quantity || 0;
-            const disableAdd = quantity === 0 && itemsLeft === 0;
+            const price = Number(product.price || 0);
+            const projectedTotal =
+              totalPrice - quantity * price + (quantity + 1) * price;
+            const disableAdd = projectedTotal > MAX_BUDGET;
 
             return (
               <div
                 key={product.id}
                 className={`rounded-md border bg-[#f3f5f7] p-3 ${
                   quantity > 0
-                    ? "border-2 border-[#2f73b4]"
-                    : "border border-[#e7eaee]"
+                    ? "border-1.5 border-[#2f73b4]"
+                    : "border-1.5 border-[#e7eaee]"
                 }`}
               >
                 <div className="mb-1 flex items-start justify-between">
@@ -205,7 +160,7 @@ export default function ProductSelectionStep({
 
                 <div className="mb-2 flex justify-center">
                   <Image
-                    src={product.image}
+                    src={`${process.env.NEXT_PUBLIC_BASE_URL}${product.image_url}`}
                     alt={product.name}
                     width={66}
                     height={90}
@@ -216,7 +171,9 @@ export default function ProductSelectionStep({
                 <p className="text-lg font-medium text-[#4a4f54]">
                   {product.name}
                 </p>
-                <p className="mb-3 text-sm text-[#8a9299]">{product.volume}</p>
+                <p className="mb-3 text-sm text-[#8a9299]">
+                  {product.quantity_with_unit}
+                </p>
 
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-1 text-sm text-[#8a9299]">
@@ -260,11 +217,13 @@ export default function ProductSelectionStep({
             <div className="mt-3 h-3 overflow-hidden rounded-full bg-[#e0e5ea]">
               <div
                 className="h-full bg-[#1e5a83] transition-all"
-                style={{ width: `${(totalItems / MAX_ITEMS) * 100}%` }}
+                style={{
+                  width: `${Math.min((totalPrice / MAX_BUDGET) * 100, 100)}%`,
+                }}
               />
             </div>
-            <p className="mt-2 text-sm font-medium text-[#1e5a83]">
-              {t("apply.itemsLeft", { count: itemsLeft })}
+            <p className="mt-1 text-xs text-[#6f7780]">
+              Total: {selectedProducts.length}
             </p>
           </div>
 
@@ -275,7 +234,7 @@ export default function ProductSelectionStep({
               selectedProductsWithImages.map((product) => (
                 <div key={product.id} className="flex items-center gap-3">
                   <Image
-                    src={product.image}
+                    src={`${process.env.NEXT_PUBLIC_BASE_URL}${product.imageUrl}`}
                     alt={product.name}
                     width={36}
                     height={48}
@@ -313,7 +272,7 @@ export default function ProductSelectionStep({
                     onClick={() =>
                       updateProductQuantity(product.id, product.quantity + 1)
                     }
-                    disabled={itemsLeft === 0}
+                    disabled={totalPrice + product.price > MAX_BUDGET}
                     className="rounded bg-[#e7eaee] p-1.5 text-[#4a4f54] transition-colors hover:bg-[#d8dde2] disabled:cursor-not-allowed disabled:opacity-40"
                     title="Add one"
                   >

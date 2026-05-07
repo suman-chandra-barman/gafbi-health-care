@@ -12,15 +12,17 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
 interface FormData {
+  applicationId: number | null;
   selectedProducts: Array<{
-    id: string;
+    id: number;
     name: string;
     quantity: number;
     volume: string;
-    price?: number;
+    price: number;
+    imageUrl?: string;
   }>;
   personalDetails: {
-    gender: "Mr" | "Mrs" | "";
+    gender: "Mr" | "Mrs" | "Diverse" | "";
     firstName: string;
     lastName: string;
     dateOfBirth: string;
@@ -42,21 +44,24 @@ interface FormData {
     phone: string;
   };
   consultation: {
-    needsConsultation: boolean;
-    consultationReason?: string;
-    alreadyHasAids: boolean;
+    answer: string;
+    reason: string;
+    alreadyProvided: boolean;
   };
   insurance: {
     type: "legal" | "private" | "local" | "";
+    name: string;
     number: string;
   };
   applicationSign: {
     hasSignedCost: boolean;
     hasSignedSupplier: boolean;
+    signatureDataUrl: string;
   };
 }
 
 const getInitialFormData = (): FormData => ({
+  applicationId: null,
   selectedProducts: [],
   personalDetails: {
     gender: "",
@@ -81,17 +86,19 @@ const getInitialFormData = (): FormData => ({
     phone: "",
   },
   consultation: {
-    needsConsultation: false,
-    consultationReason: "",
-    alreadyHasAids: false,
+    answer: "",
+    reason: "",
+    alreadyProvided: false,
   },
   insurance: {
     type: "",
+    name: "",
     number: "",
   },
   applicationSign: {
     hasSignedCost: false,
     hasSignedSupplier: false,
+    signatureDataUrl: "",
   },
 });
 
@@ -167,7 +174,12 @@ export default function ApplyBoxStepper() {
           />
         );
       case 4:
-        return <DoneStep onComplete={handleComplete} />;
+        return (
+          <DoneStep
+            applicationId={formData.applicationId}
+            onComplete={handleComplete}
+          />
+        );
       default:
         return null;
     }

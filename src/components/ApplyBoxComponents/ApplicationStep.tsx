@@ -7,6 +7,9 @@ import { MoveLeft, NotebookText, RefreshCw } from "lucide-react";
 import React, { useState, useRef } from "react";
 import { PiWarning } from "react-icons/pi";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
+import { useApplyCareBoxMutation } from "@/redux/features/careBox/careBoxApi";
+import type { ApplyCareBoxPayload } from "@/redux/features/careBox/careBoxApi";
 
 interface ApplicationStepProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,9 +32,11 @@ export default function ApplicationStep({
     applicationSign: data.applicationSign,
   });
   const [isDrawing, setIsDrawing] = useState(false);
+  const [hasSignature, setHasSignature] = useState(false);
   const [showPrivateInsuranceModal, setShowPrivateInsuranceModal] =
     useState(false);
   const [showInsuranceTipModal, setShowInsuranceTipModal] = useState(false);
+  const [applyCareBox, { isLoading: isSubmitting }] = useApplyCareBoxMutation();
 
   const handleInputChange = (
     section: string,
@@ -61,6 +66,23 @@ export default function ApplicationStep({
     };
   };
 
+  const getCanvasPointFromTouch = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+
+    const touch = e.touches[0];
+    if (!touch) return null;
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    return {
+      x: (touch.clientX - rect.left) * scaleX,
+      y: (touch.clientY - rect.top) * scaleY,
+    };
+  };
+
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -72,6 +94,24 @@ export default function ApplicationStep({
     if (!point) return;
 
     setIsDrawing(true);
+    setHasSignature(true);
+    ctx.beginPath();
+    ctx.moveTo(point.x, point.y);
+  };
+
+  const startDrawingTouch = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const point = getCanvasPointFromTouch(e);
+    if (!point) return;
+
+    setIsDrawing(true);
+    setHasSignature(true);
     ctx.beginPath();
     ctx.moveTo(point.x, point.y);
   };
@@ -92,6 +132,23 @@ export default function ApplicationStep({
     ctx.stroke();
   };
 
+  const drawTouch = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    if (!isDrawing) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const point = getCanvasPointFromTouch(e);
+    if (!point) return;
+
+    ctx.lineTo(point.x, point.y);
+    ctx.stroke();
+  };
+
   const stopDrawing = () => {
     if (!canvasRef.current) return;
     const ctx = canvasRef.current.getContext("2d");
@@ -104,10 +161,86 @@ export default function ApplicationStep({
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setHasSignature(false);
   };
 
-  const handleNext = () => {
-    onNext(formData);
+  const mapGender = (value: string): ApplyCareBoxPayload["gender"] => {
+    if (value === "Mr") return "mister";
+    if (value === "Mrs") return "woman";
+    if (value === "Diverse") return "diverse";
+    return "";
+  };
+
+  const mapInsuranceType = (
+    value: string,
+  ): ApplyCareBoxPayload["insurance_type"] => {
+    if (value === "legal") return "legally_insured";
+    if (value === "private") return "privately_insured";
+    if (value === "local") return "local_social_welfare_office";
+    return "";
+  };
+
+  const mapConsultationAnswer = (value: string) => value.replace(/-/g, "_");
+
+  const handleNext = async () => {
+    const signatureDataUrl = canvasRef.current?.toDataURL("image/png") || "";
+    if (!hasSignature || !signatureDataUrl) {
+      toast("Please add your signature");
+      return;
+    }
+
+    const levelOfCare = Number.parseInt(
+      data.personalDetails.careLevel || "",
+      10,
+    );
+    const selectedProducts = data.selectedProducts as Array<{
+      id: number;
+      quantity: number;
+    }>;
+
+    const payload: ApplyCareBoxPayload = {
+      products: selectedProducts.map((product) => ({
+        product_id: product.id,
+        quantity: product.quantity,
+      })),
+      gender: mapGender(data.personalDetails.gender),
+      first_name: data.personalDetails.firstName,
+      last_name: data.personalDetails.lastName,
+      date_of_birth: data.personalDetails.dateOfBirth,
+      level_of_care: Number.isNaN(levelOfCare) ? null : levelOfCare,
+      street_address: data.address.street,
+      area: data.address.area,
+      city: data.address.city,
+      zip_code: data.address.zipCode,
+      different_delivery_address: data.address.differentDelivery,
+      email: data.contact.email,
+      phone_number: data.contact.phone,
+      consultation_answer: mapConsultationAnswer(data.consultation.answer),
+      consultation_reason: data.consultation.reason || undefined,
+      already_provided_with_care_aids: data.consultation.alreadyProvided,
+      insurance_type: mapInsuranceType(formData.insurance.type),
+      insurance_name: formData.insurance.name,
+      insurance_number: formData.insurance.number,
+      signature: signatureDataUrl,
+      signed_cost_assumption: formData.applicationSign.hasSignedCost,
+      signed_supplier_change: formData.applicationSign.hasSignedSupplier,
+    };
+
+    try {
+      const response = await applyCareBox(payload).unwrap();
+      toast(response.message || "Application submitted");
+      onNext({
+        applicationId: response.data.id,
+        insurance: formData.insurance,
+        applicationSign: {
+          ...formData.applicationSign,
+          signatureDataUrl,
+        },
+      });
+    } catch (error) {
+      console.error("Error submitting application:", error);
+      toast(error?.data?.message || "Failed to submit application");
+    }
   };
 
   const handlePrivateInsuranceSelection = () => {
@@ -118,9 +251,11 @@ export default function ApplicationStep({
   const isFormValid = () => {
     return (
       formData.insurance.type &&
+      formData.insurance.name &&
       formData.insurance.number &&
       formData.applicationSign.hasSignedCost &&
-      formData.applicationSign.hasSignedSupplier
+      formData.applicationSign.hasSignedSupplier &&
+      hasSignature
     );
   };
 
@@ -174,17 +309,20 @@ export default function ApplicationStep({
             ))}
           </div>
 
-          {/* Insurance Dropdown */}
+          {/* Insurance Provider Input */}
           <div>
             <label className="mb-2 block text-sm font-medium text-primary">
               Health or long-term care insurance
             </label>
-            <select
-              defaultValue=""
+            <input
+              type="text"
+              placeholder="Enter insurance provider"
+              value={formData.insurance.name}
+              onChange={(e) =>
+                handleInputChange("insurance", "name", e.target.value)
+              }
               className="w-full rounded-md border border-gray-300 px-4 py-2 sm:py-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-button-bg"
-            >
-              <option value="">Select insurance provider</option>
-            </select>
+            />
           </div>
 
           {/* Insurance Number Input */}
@@ -232,13 +370,17 @@ export default function ApplicationStep({
 
           <div className="mb-4 flex flex-col gap-2">
             <a
-              href="#"
+              href="/files/Open application for cost coverage.pdf"
+              target="_blank"
+              rel="noreferrer"
               className="inline-flex items-center gap-2 text-xs text-button-bg underline sm:text-sm"
             >
               <NotebookText /> Open application for cost coverage
             </a>
             <a
-              href="#"
+              href="/files/Open application for a change of supplier.pdf"
+              target="_blank"
+              rel="noreferrer"
               className="inline-flex items-center gap-2 text-xs text-button-bg underline sm:text-sm"
             >
               <NotebookText /> Open application for a change of supplier
@@ -257,6 +399,10 @@ export default function ApplicationStep({
               onMouseMove={draw}
               onMouseUp={stopDrawing}
               onMouseLeave={stopDrawing}
+              onTouchStart={startDrawingTouch}
+              onTouchMove={drawTouch}
+              onTouchEnd={stopDrawing}
+              onTouchCancel={stopDrawing}
               className="w-full h-auto border border-gray-300 bg-white cursor-crosshair rounded"
               style={{ aspectRatio: "400/150", maxHeight: "200px" }}
             />
@@ -320,20 +466,20 @@ export default function ApplicationStep({
           </p>
         </div>
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-between\">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-between">
           <button
             onClick={onPrev}
-            className="flex cursor-pointer items-center justify-center gap-2 px-6 py-2 text-xs sm:text-sm font-semibold text-button-bg transition-all hover:opacity-80 sm:py-3 order-2 sm:order-1\"
+            className="flex cursor-pointer items-center justify-center gap-2 px-6 py-2 text-xs sm:text-sm font-semibold text-button-bg transition-all hover:opacity-80 sm:py-3 order-2 sm:order-1"
           >
             <MoveLeft />{" "}
-            <span className="hidden sm:inline\">{t("common.previous")}</span>
+            <span className="hidden sm:inline">{t("common.previous")}</span>
           </button>
           <button
             onClick={handleNext}
-            disabled={!isFormValid()}
-            className="rounded-md bg-button-bg cursor-pointer px-6 sm:px-8 py-2 sm:py-3 text-xs sm:text-base font-semibold text-white hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2\"
+            disabled={!isFormValid() || isSubmitting}
+            className="rounded-md bg-button-bg cursor-pointer px-6 sm:px-8 py-2 sm:py-3 text-xs sm:text-base font-semibold text-white hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
           >
-            {t("common.submit")}
+            {isSubmitting ? "Submitting..." : t("common.submit")}
           </button>
         </div>
       </div>

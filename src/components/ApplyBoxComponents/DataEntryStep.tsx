@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { MoveLeft, MoveRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "next/navigation";
 
 interface DataEntryStepProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,17 +28,15 @@ export default function DataEntryStep({
   onPrev,
 }: DataEntryStepProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [formData, setFormData] = useState({
     personalDetails: data.personalDetails,
     address: data.address,
     contact: data.contact,
+    consultation: data.consultation,
   });
   const [currentSubStep, setCurrentSubStep] = useState(1);
-  const [consultationChoice, setConsultationChoice] = useState("");
-  const [consultationReason, setConsultationReason] = useState("");
-  const [suppliedByAnotherProvider, setSuppliedByAnotherProvider] =
-    useState(false);
 
   const handleInputChange = (
     section: string,
@@ -75,6 +74,11 @@ export default function DataEntryStep({
     onNext(formData);
   };
 
+  const handleSkipAccount = () => {
+    setShowAccountModal(false);
+    router.push("/");
+  };
+
   const isStep1Valid = () => {
     return (
       formData.personalDetails.gender &&
@@ -100,6 +104,10 @@ export default function DataEntryStep({
   };
 
   const isStep3Valid = () => {
+    if (!formData.consultation.answer) return false;
+    if (formData.consultation.answer === "no-because") {
+      return Boolean(formData.consultation.reason);
+    }
     return true;
   };
 
@@ -154,6 +162,23 @@ export default function DataEntryStep({
                     className="h-4 w-4"
                   />
                   <span className="text-sm text-secondary">Woman</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Diverse"
+                    checked={formData.personalDetails.gender === "Diverse"}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "personalDetails",
+                        "gender",
+                        e.target.value,
+                      )
+                    }
+                    className="h-4 w-4"
+                  />
+                  <span className="text-sm text-secondary">Diverse</span>
                 </label>
               </div>
             </div>
@@ -238,6 +263,11 @@ export default function DataEntryStep({
                   <option value="3">Level 3</option>
                   <option value="4">Level 4</option>
                   <option value="5">Level 5</option>
+                  <option value="6">Level 6</option>
+                  <option value="7">Level 7</option>
+                  <option value="8">Level 8</option>
+                  <option value="9">Level 9</option>
+                  <option value="10">Level 10</option>
                 </select>
               </div>
             </div>
@@ -432,7 +462,8 @@ export default function DataEntryStep({
               onClick={handlePrevSubStep}
               className="flex cursor-pointer items-center justify-center gap-2 px-6 py-2 text-xs sm:text-sm font-semibold text-button-bg transition-all hover:opacity-80 sm:py-3 order-2 sm:order-1"
             >
-              <MoveLeft /> <span className="hidden sm:inline\">{t("common.previous")}</span>
+              <MoveLeft />
+              <span className="hidden sm:inline">{t("common.previous")}</span>
             </button>
             <button
               onClick={handleNext}
@@ -462,8 +493,10 @@ export default function DataEntryStep({
                   type="radio"
                   name="consultation"
                   value="yes-phone"
-                  checked={consultationChoice === "yes-phone"}
-                  onChange={(e) => setConsultationChoice(e.target.value)}
+                  checked={formData.consultation.answer === "yes-phone"}
+                  onChange={(e) =>
+                    handleInputChange("consultation", "answer", e.target.value)
+                  }
                   className="h-4 w-4"
                 />
                 Yes, you can get advice by phone
@@ -473,8 +506,10 @@ export default function DataEntryStep({
                   type="radio"
                   name="consultation"
                   value="no-professional"
-                  checked={consultationChoice === "no-professional"}
-                  onChange={(e) => setConsultationChoice(e.target.value)}
+                  checked={formData.consultation.answer === "no-professional"}
+                  onChange={(e) =>
+                    handleInputChange("consultation", "answer", e.target.value)
+                  }
                   className="h-4 w-4"
                 />
                 No, I have already been advised (nursing service, health
@@ -485,8 +520,10 @@ export default function DataEntryStep({
                   type="radio"
                   name="consultation"
                   value="no-products"
-                  checked={consultationChoice === "no-products"}
-                  onChange={(e) => setConsultationChoice(e.target.value)}
+                  checked={formData.consultation.answer === "no-products"}
+                  onChange={(e) =>
+                    handleInputChange("consultation", "answer", e.target.value)
+                  }
                   className="h-4 w-4"
                 />
                 No, I know my needs and the products.
@@ -496,8 +533,10 @@ export default function DataEntryStep({
                   type="radio"
                   name="consultation"
                   value="no-experience"
-                  checked={consultationChoice === "no-experience"}
-                  onChange={(e) => setConsultationChoice(e.target.value)}
+                  checked={formData.consultation.answer === "no-experience"}
+                  onChange={(e) =>
+                    handleInputChange("consultation", "answer", e.target.value)
+                  }
                   className="h-4 w-4"
                 />
                 No, I already receive care aids and know my way around.
@@ -507,8 +546,10 @@ export default function DataEntryStep({
                   type="radio"
                   name="consultation"
                   value="no-dont-want"
-                  checked={consultationChoice === "no-dont-want"}
-                  onChange={(e) => setConsultationChoice(e.target.value)}
+                  checked={formData.consultation.answer === "no-dont-want"}
+                  onChange={(e) =>
+                    handleInputChange("consultation", "answer", e.target.value)
+                  }
                   className="h-4 w-4"
                 />
                 No, I don&apos;t want to be advised.
@@ -518,17 +559,21 @@ export default function DataEntryStep({
                   type="radio"
                   name="consultation"
                   value="no-because"
-                  checked={consultationChoice === "no-because"}
-                  onChange={(e) => setConsultationChoice(e.target.value)}
+                  checked={formData.consultation.answer === "no-because"}
+                  onChange={(e) =>
+                    handleInputChange("consultation", "answer", e.target.value)
+                  }
                   className="h-4 w-4"
                 />
                 No, because:
               </label>
-              {consultationChoice === "no-because" && (
+              {formData.consultation.answer === "no-because" && (
                 <textarea
                   placeholder="Tell us why don't you need advice?"
-                  value={consultationReason}
-                  onChange={(e) => setConsultationReason(e.target.value)}
+                  value={formData.consultation.reason}
+                  onChange={(e) =>
+                    handleInputChange("consultation", "reason", e.target.value)
+                  }
                   className="min-h-22.5 w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-button-bg"
                 />
               )}
@@ -541,9 +586,13 @@ export default function DataEntryStep({
               <label className="flex items-center gap-2 text-sm text-secondary cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={suppliedByAnotherProvider}
+                  checked={formData.consultation.alreadyProvided}
                   onChange={(e) =>
-                    setSuppliedByAnotherProvider(e.target.checked)
+                    handleInputChange(
+                      "consultation",
+                      "alreadyProvided",
+                      e.target.checked,
+                    )
                   }
                   className="h-4 w-4"
                 />
@@ -555,14 +604,15 @@ export default function DataEntryStep({
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-between">
             <button
               onClick={handlePrevSubStep}
-              className="flex cursor-pointer items-center justify-center gap-2 px-6 py-2 text-xs sm:text-sm font-semibold text-button-bg transition-all hover:opacity-80 sm:py-3 order-2 sm:order-1\"
+              className="flex cursor-pointer items-center justify-center gap-2 px-6 py-2 text-xs sm:text-sm font-semibold text-button-bg transition-all hover:opacity-80 sm:py-3 order-2 sm:order-1"
             >
-              <MoveLeft /> <span className="hidden sm:inline\">{t("common.previous")}</span>
+              <MoveLeft />
+              <span className="hidden sm:inline">{t("common.previous")}</span>
             </button>
             <button
               onClick={handleNext}
               disabled={!isStep3Valid()}
-              className="flex cursor-pointer items-center justify-center gap-2 rounded-md bg-button-bg px-6 sm:px-8 py-2 sm:py-3 text-xs sm:text-base font-semibold text-white hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2\"
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-md bg-button-bg px-6 sm:px-8 py-2 sm:py-3 text-xs sm:text-base font-semibold text-white hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
             >
               {t("common.next")} 3/3{" "}
               <span>
@@ -595,7 +645,7 @@ export default function DataEntryStep({
               Create
             </button>
             <button
-              onClick={handleCreateAccount}
+              onClick={handleSkipAccount}
               className="w-full cursor-pointer rounded-md border-2 border-button-bg py-2 text-sm font-semibold text-button-bg hover:bg-blue-50 transition-all"
             >
               Do not manage care box online
