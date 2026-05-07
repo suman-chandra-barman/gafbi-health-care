@@ -10,57 +10,10 @@ import ApplicationStep from "./ApplicationStep";
 import DoneStep from "./DoneStep";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
+import { CareboxFormData } from "@/types/carebox";
 
-interface FormData {
-  applicationId: number | null;
-  selectedProducts: Array<{
-    id: number;
-    name: string;
-    quantity: number;
-    volume: string;
-    price: number;
-    imageUrl?: string;
-  }>;
-  personalDetails: {
-    gender: "Mr" | "Mrs" | "Diverse" | "";
-    firstName: string;
-    lastName: string;
-    dateOfBirth: string;
-    careLevel: string;
-  };
-  address: {
-    street: string;
-    area: string;
-    city: string;
-    zipCode: string;
-    differentDelivery: boolean;
-    deliveryStreet: string;
-    deliveryArea: string;
-    deliveryCity: string;
-    deliveryZipCode: string;
-  };
-  contact: {
-    email: string;
-    phone: string;
-  };
-  consultation: {
-    answer: string;
-    reason: string;
-    alreadyProvided: boolean;
-  };
-  insurance: {
-    type: "legal" | "private" | "local" | "";
-    name: string;
-    number: string;
-  };
-  applicationSign: {
-    hasSignedCost: boolean;
-    hasSignedSupplier: boolean;
-    signatureDataUrl: string;
-  };
-}
 
-const getInitialFormData = (): FormData => ({
+const getInitialFormData = (): CareboxFormData => ({
   applicationId: null,
   selectedProducts: [],
   personalDetails: {
@@ -112,10 +65,10 @@ export default function ApplyBoxStepper() {
   ];
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState<FormData>(getInitialFormData);
+  const [formData, setFormData] = useState<CareboxFormData>(getInitialFormData);
   const [isApplicationCompleted, setIsApplicationCompleted] = useState(false);
 
-  const handleNext = (updatedData?: Partial<FormData>) => {
+  const handleNext = (updatedData?: Partial<CareboxFormData>) => {
     if (updatedData) {
       setFormData((prev) => ({ ...prev, ...updatedData }));
     }

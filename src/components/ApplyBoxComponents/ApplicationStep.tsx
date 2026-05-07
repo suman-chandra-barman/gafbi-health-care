@@ -237,9 +237,17 @@ export default function ApplicationStep({
           signatureDataUrl,
         },
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error submitting application:", error);
-      toast(error?.data?.message || "Failed to submit application");
+      const message =
+        typeof error === "object" &&
+        error !== null &&
+        "data" in error &&
+        typeof (error as { data?: { message?: string } }).data?.message ===
+          "string"
+          ? (error as { data?: { message?: string } }).data?.message
+          : "Failed to submit application";
+      toast(message);
     }
   };
 
