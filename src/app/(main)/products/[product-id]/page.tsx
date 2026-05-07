@@ -7,52 +7,76 @@ import Link from "next/link";
 import { Star } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-
-const initialReviews = [
-  {
-    name: "Alex Morgan",
-    time: "1 mo ago",
-    content:
-      "The item arrived in excellent condition and was packaged with great care to prevent any damage during transit. Shipping was both fast and reliable. It arrived on time and the cost was very fair given the speed of delivery.",
-  },
-  {
-    name: "Alex Morgan",
-    time: "1 mo ago",
-    content:
-      "The item looks just as great in person as it did in the photos and works perfectly. I have tested it thoroughly with no issues at all. For the price, including shipping, the overall value is truly outstanding.",
-  },
-  {
-    name: "Alex Morgan",
-    time: "1 mo ago",
-    content:
-      "I am very happy with the purchase and highly recommend this seller.",
-  },
-];
+import { useParams } from "next/navigation";
+import ProductDescription from "@/components/ProductComponents/ProductDescription";
+import ReviewsAndRatings from "@/components/ProductComponents/ReviewsAndRatings";
+import {
+  useAddProductReviewMutation,
+  useGetProductByIdQuery,
+} from "@/redux/features/products/productsApi";
 
 const ProductDetails = () => {
   const { t } = useTranslation();
+  const params = useParams();
+  const productIdParam = params["product-id"];
+  const productId = Array.isArray(productIdParam)
+    ? productIdParam[0]
+    : productIdParam;
+
   const [activeTab, setActiveTab] = useState<"description" | "reviews">(
     "description",
   );
-  const [reviewItems, setReviewItems] = useState(initialReviews);
-  const [reviewContent, setReviewContent] = useState("");
-  const [reviewName, setReviewName] = useState("");
-  const [reviewEmail, setReviewEmail] = useState("");
+  const { data, isLoading, isError, refetch } = useGetProductByIdQuery(
+    productId ?? "",
+    {
+      skip: !productId,
+    },
+  );
+  const [addProductReview, { isLoading: isSubmittingReview }] =
+    useAddProductReviewMutation();
 
-  function handleReviewSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!reviewContent.trim() || !reviewName.trim()) return;
-    setReviewItems([
-      {
-        name: reviewName,
-        time: "just now",
-        content: reviewContent,
-      },
-      ...reviewItems,
-    ]);
-    setReviewContent("");
-    setReviewName("");
-    setReviewEmail("");
+  const product = data?.data;
+
+  const handleReviewSubmit = async (payload: {
+    name: string;
+    email: string;
+    rating: number;
+    review: string;
+  }) => {
+    if (!product) return;
+
+    await addProductReview({
+      productId: product.id,
+      payload,
+    }).unwrap();
+
+    await refetch();
+  };
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-(--color-card-bg) px-4 pb-12 pt-3 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="animate-pulse">
+            <div className="mb-6 h-4 w-1/3 rounded bg-slate-200" />
+            <div className="mb-6 h-10 w-1/2 rounded bg-slate-200" />
+            <div className="h-96 rounded bg-slate-200" />
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (isError || !product) {
+    return (
+      <main className="min-h-screen bg-(--color-card-bg) px-4 pb-12 pt-3 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="rounded-md bg-red-50 px-4 py-3 text-red-600">
+            Failed to fetch product details
+          </div>
+        </div>
+      </main>
+    );
   }
 
   return (
@@ -78,29 +102,34 @@ const ProductDetails = () => {
           <div className="mb-6 flex flex-col gap-5 sm:flex-row sm:items-start">
             <div className="flex min-w-36 justify-center">
               <Image
-                src="/antifect.png"
-                alt="Surface Disinfectant"
+                src={`${process.env.NEXT_PUBLIC_BASE_URL}${product.image_url}`}
+                alt={product.name}
                 width={110}
                 height={166}
+                className="h-auto w-auto"
               />
             </div>
 
             <div>
               <h1 className="mb-1 text-3xl font-semibold text-(--color-primary)">
-                Surface Disinfectant
+                {product.name}
               </h1>
-              <p className="mb-2 text-base text-(--color-secondary)">500 ml</p>
+              <p className="mb-2 text-base text-(--color-secondary)">
+                {product.quantity_with_unit}
+              </p>
               <p className="mb-6 flex items-center gap-1 text-base font-semibold text-[#d3a008]">
                 <Star size={14} fill="currentColor" strokeWidth={0} />
-                4.5
+                {product.average_rating.toFixed(1)}
               </p>
 
-              <button
-                type="button"
-                className="rounded-md bg-(--color-button-bg) px-5 py-2 text-base font-semibold text-white cursor-pointer"
-              >
-                {t("productsPage.bookingRequest")}
-              </button>
+              <Link href={`/apply-box`}>
+                <button
+                  type="button"
+                  className="rounded-md bg-(--color-button-bg) px-5 py-2 text-base font-semibold text-white cursor-pointer"
+                >
+                  {t("productsPage.goToCarebox")}
+                </button>
+              </Link>
             </div>
           </div>
 
@@ -130,146 +159,16 @@ const ProductDetails = () => {
           </div>
 
           {activeTab === "description" ? (
-            <div className="space-y-1 text-base leading-7 text-(--color-primary)">
-              <p>
-                Dr. Schumacher - Aseptoman Med - alcoholic hand disinfectant
-                wipes - 15 pcs.
-              </p>
-              <p>
-                Dr. Schumacher&apos;s Aseptoman Med hand disinfectant wipes
-                offer an effective solution for hygienic hand disinfection on
-                the go.
-              </p>
-              <p>
-                Each wipe is soaked in an alcohol-based solution that reliably
-                reduces germs while being gentle on the skin.
-              </p>
-              <p>Product features:</p>
-              <p>
-                Effective disinfection: The wipes are bactericidal, yeasticidal,
-                and tuberculocidal.
-              </p>
-              <p>
-                Skin-friendly: Thanks to high-quality, moisturizing ingredients,
-                the skin is protected from drying out.
-              </p>
-              <p>
-                Fast action time: The disinfectant solution takes effect within
-                a very short time.
-              </p>
-              <p>
-                Fragrance-free: The wipes are fragrance-free and therefore ideal
-                for people with sensitive skin.
-              </p>
-              <p>
-                Convenient packaging: The pack contains 15 individually
-                removable wipes that can be easily stored in a bag or car.
-              </p>
-              <p>Areas of application:</p>
-              <p>
-                Aseptoman Med hand disinfectant wipes are ideally suited for use
-                in various areas: on the go, in the workplace, and at home.
-              </p>
-            </div>
+            <ProductDescription description={product.description} />
           ) : (
-            <div className="grid gap-6 lg:grid-cols-[250px_1fr]">
-              <aside>
-                <h2 className="mb-5 text-xl font-semibold text-(--color-primary)">
-                  4.6
-                </h2>
-                <p className="mb-2 text-base text-(--color-primary)">
-                  634 product ratings
-                </p>
-                {[5, 4, 3, 2, 1].map((star, index) => (
-                  <div
-                    key={star}
-                    className="mb-2 flex items-center gap-2 text-sm"
-                  >
-                    <span className="w-4">{star}</span>
-                    <div className="h-1.5 w-full rounded bg-slate-200">
-                      <div
-                        className="h-1.5 rounded bg-[#d3a008]"
-                        style={{ width: `${[85, 50, 30, 20, 25][index]}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-
-                <div className="mt-8">
-                  <h3 className="mb-2 text-lg font-semibold text-(--color-primary)">
-                    {t("productsPage.reviewProduct")}
-                  </h3>
-                  <p className="mb-3 text-sm text-(--color-secondary)">
-                    {t("productsPage.shareThoughts")}
-                  </p>
-                  <form onSubmit={handleReviewSubmit}>
-                    <textarea
-                      className="mb-2 h-20 w-full rounded-md border border-slate-300 px-3 py-2 text-base outline-none"
-                      placeholder={t("productsPage.shareThoughts")}
-                      value={reviewContent}
-                      onChange={(e) => setReviewContent(e.target.value)}
-                      required
-                    />
-                    <input
-                      className="mb-2 w-full rounded-md border border-slate-300 px-3 py-2 text-base outline-none"
-                      placeholder="Enter your Name"
-                      value={reviewName}
-                      onChange={(e) => setReviewName(e.target.value)}
-                      required
-                    />
-                    <input
-                      className="mb-3 w-full rounded-md border border-slate-300 px-3 py-2 text-base outline-none"
-                      placeholder="Email Address"
-                      value={reviewEmail}
-                      onChange={(e) => setReviewEmail(e.target.value)}
-                      type="email"
-                    />
-                    <button
-                      type="submit"
-                      className="rounded-md bg-(--color-button-bg) px-4 py-1.5 text-base font-semibold text-white cursor-pointer transition-colors duration-150 hover:bg-[var(--color-primary)]"
-                    >
-                      {t("common.submit")}
-                    </button>
-                  </form>
-                </div>
-              </aside>
-
-              <section>
-                <h2 className="mb-4 text-lg font-semibold text-(--color-primary)">
-                  {t("productsPage.mostRelevant")}
-                </h2>
-                <div className="space-y-5">
-                  {reviewItems.map((item, idx) => (
-                    <article
-                      key={`${item.name}-${idx}`}
-                      className="border-b border-slate-200 pb-4"
-                    >
-                      <div className="mb-2 flex items-center justify-between">
-                        <p className="text-base font-semibold text-(--color-primary)">
-                          {item.name}
-                        </p>
-                        <p className="text-sm text-(--color-secondary)">
-                          {item.time}
-                        </p>
-                      </div>
-                      <p className="mb-2 flex items-center gap-1 text-[#d3a008]">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star
-                            key={i}
-                            size={12}
-                            fill="currentColor"
-                            strokeWidth={0}
-                          />
-                        ))}
-                      </p>
-                      <p className="text-base leading-6 text-(--color-primary)">
-                        {item.content}
-                      </p>
-                    </article>
-                  ))}
-                </div>
-              </section>
-            </div>
+            <ReviewsAndRatings
+              average_rating={product.average_rating}
+              total_reviews={product.total_reviews}
+              rating_breakdown={product.rating_breakdown}
+              reviews={product.reviews}
+              isSubmittingReview={isSubmittingReview}
+              onSubmitReview={handleReviewSubmit}
+            />
           )}
         </section>
       </div>

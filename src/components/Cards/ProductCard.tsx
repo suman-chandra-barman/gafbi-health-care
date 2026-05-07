@@ -23,17 +23,17 @@ const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <article
       key={product.id}
-      className="rounded-md bg-white p-3 shadow-[0_0_0_1px_rgba(0,0,0,0.04)] transition-transform duration-200 hover:scale-[1.025] hover:shadow-lg group"
+      className="group rounded-xl bg-white p-3 shadow-[0_0_0_1px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl"
       tabIndex={0}
       aria-label={product.name}
     >
-      <div className="mb-3 flex items-end justify-center">
+      <div className="mb-3 flex h-28 items-center justify-center rounded-lg bg-gradient-to-b from-slate-50 to-white px-2 ring-1 ring-slate-100">
         <Image
-          src={product.image}
+          src={`${process.env.NEXT_PUBLIC_BASE_URL}${product.image}`}
           alt={product.name}
           width={78}
           height={115}
-          className="h-auto w-auto select-none pointer-events-none"
+          className="max-h-full w-auto select-none object-contain pointer-events-none"
           draggable={false}
         />
       </div>
