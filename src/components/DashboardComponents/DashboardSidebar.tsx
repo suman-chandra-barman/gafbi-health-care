@@ -1,20 +1,12 @@
 /** @format */
 "use client";
-import React from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import {
-  Box,
-  CloudUpload,
-  Headset,
-  List,
-  LogOut,
-  Truck,
-  User,
-} from "lucide-react";
+import { CloudUpload, Headset, List, LogOut, Truck, User } from "lucide-react";
 import { useDashboardSidebar } from "./DashboardSidebarProvider";
+import { Button } from "../ui/button";
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
@@ -26,11 +18,6 @@ export default function DashboardSidebar() {
       href: "/dashboard/overview",
       icon: List,
       label: "Overview",
-    },
-    {
-      href: "/dashboard/manage-gafbi-box",
-      icon: Box,
-      label: "Manage Gafbi box",
     },
     {
       href: "/dashboard/manage-delivery-address",
@@ -52,18 +39,13 @@ export default function DashboardSidebar() {
       icon: Headset,
       label: "Customer service",
     },
-    {
-      href: "/dashboard/unsubscribe",
-      icon: LogOut,
-      label: "Unsubscribe",
-    },
   ];
 
   return (
     <>
       <div
         className={cn(
-          "fixed md:relative z-40 h-screen shrink-0 border-r border-white/70 bg-[#e8f0f7] transition-all duration-300",
+          "fixed md:relative z-40 flex h-screen shrink-0 flex-col border-r border-white/70 bg-[#e8f0f7] transition-all duration-300",
           isCollapsed ? "md:w-20" : "md:w-70",
           isMobileMenuOpen
             ? "translate-x-0"
@@ -130,6 +112,23 @@ export default function DashboardSidebar() {
             );
           })}
         </nav>
+
+        <div className={cn("mt-auto pb-5", isCollapsed ? "px-2" : "px-3")}>
+          <Button
+            type="button"
+            onClick={closeMobileMenu}
+            className={cn(
+              "w-full rounded-xl py-3 text-[0.96rem] font-medium text-[#b42318] hover:bg-[#fdecec]",
+              isCollapsed
+                ? "flex h-11 items-center justify-center px-2"
+                : "flex items-center gap-3 px-4",
+            )}
+            variant="ghost"
+          >
+            <LogOut size={19} strokeWidth={2} />
+            {!isCollapsed && <span>Logout</span>}
+          </Button>
+        </div>
       </div>
 
       {isMobileMenuOpen && (

@@ -22,7 +22,7 @@ export default function DashboardLayout({
         <div className="flex-1 flex flex-col overflow-hidden">
           <NavBar />
           <div className="flex-1 overflow-auto bg-root-bg px-6 lg:px-8 py-1 lg:py-2">
-            <div className="min-h-screen">{children}</div>
+            <div>{children}</div>
           </div>
         </div>
       </div>
