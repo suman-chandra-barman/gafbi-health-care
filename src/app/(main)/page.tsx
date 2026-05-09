@@ -3,9 +3,9 @@
 import HeroSection from "@/components/LandingPageComponents/HeroSection";
 import CareBoxSection from "@/components/LandingPageComponents/CareBoxSection";
 import AboutSection from "@/components/LandingPageComponents/AboutSection";
-import ClientsReviewSection from "@/components/LandingPageComponents/ClientsReviewSection";
 import ProductsSection from "@/components/LandingPageComponents/ProductsSection";
 import ServicesSection from "@/components/LandingPageComponents/ServicesSection";
+import ClientsReviewSection from "@/components/LandingPageComponents/ClientsReviewSection";
 
 export default function Home() {
   return (

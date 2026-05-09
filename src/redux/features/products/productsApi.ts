@@ -9,6 +9,12 @@ export interface ProductReview {
   created_at: string;
 }
 
+export interface ProductReviewsResponse {
+  success: boolean;
+  message: string;
+  data: ProductReview[];
+}
+
 export interface ProductRatingBreakdown {
   "1": number;
   "2": number;
@@ -94,6 +100,13 @@ export const productsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Product"],
     }),
+    getProductReviews: builder.query<ProductReviewsResponse, void>({
+      query: () => ({
+        url: "/products/reviews/",
+        method: "GET",
+      }),
+      providesTags: ["Product"],
+    }),
   }),
 });
 
@@ -101,4 +114,5 @@ export const {
   useGetProductsQuery,
   useGetProductByIdQuery,
   useAddProductReviewMutation,
+  useGetProductReviewsQuery,
 } = productsApi;
