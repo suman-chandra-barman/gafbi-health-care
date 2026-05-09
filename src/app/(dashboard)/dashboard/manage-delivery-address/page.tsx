@@ -1,6 +1,7 @@
 /** @format */
 "use client";
 import React, { useMemo, useState } from "react";
+import { toast } from "react-toastify";
 import { PageHeader } from "@/components/HomeComponents";
 import {
   CurrentAddressDisplay,
@@ -54,17 +55,18 @@ const ManageDeliveryAddressPage = () => {
     }
 
     try {
-      await updateDeliveryAddress({
+      const response = await updateDeliveryAddress({
         street_address: formData.streetAddress,
         area: formData.area,
         city: formData.city,
         zip_code: formData.zipCode,
         phone_number: formData.phoneNumber,
       }).unwrap();
+      toast.success(response.message || "Delivery address updated.");
       setIsEditing(false);
       setFormData(emptyFormData);
     } catch {
-      // Keep edit mode enabled so the user can retry.
+      toast.error("Failed to update delivery address.");
     }
   };
 
