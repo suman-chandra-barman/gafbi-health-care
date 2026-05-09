@@ -18,7 +18,7 @@ const EmailDisplay = ({ email }: EmailDisplayProps) => {
         <span className="text-sm text-tertiary">{email}</span>
       </div>
       <p className="text-xs text-tertiary">
-        Email cannot be changed. Contact support if needed.
+        Email cannot be changed.
       </p>
     </div>
   );

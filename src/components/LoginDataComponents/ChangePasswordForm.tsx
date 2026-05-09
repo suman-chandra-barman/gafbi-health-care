@@ -6,7 +6,6 @@ import EmailDisplay from "./EmailDisplay";
 import PasswordInput from "./PasswordInput";
 
 export interface LoginFormData {
-  currentPassword: string;
   newPassword: string;
   confirmPassword: string;
 }
@@ -16,6 +15,7 @@ interface ChangePasswordFormProps {
   formData: LoginFormData;
   onChange: (field: keyof LoginFormData, value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
+  isSubmitting?: boolean;
 }
 
 const ChangePasswordForm = ({
@@ -23,6 +23,7 @@ const ChangePasswordForm = ({
   formData,
   onChange,
   onSubmit,
+  isSubmitting = false,
 }: ChangePasswordFormProps) => {
   return (
     <form onSubmit={onSubmit} className="space-y-5">
@@ -33,12 +34,6 @@ const ChangePasswordForm = ({
           Change Password
         </h3>
         <div className="space-y-4">
-          <PasswordInput
-            label="Current password"
-            value={formData.currentPassword}
-            onChange={(value) => onChange("currentPassword", value)}
-            placeholder="Enter current password"
-          />
           <PasswordInput
             label="New password"
             value={formData.newPassword}
@@ -55,7 +50,11 @@ const ChangePasswordForm = ({
       </div>
 
       <div className="pt-4">
-        <Button type="submit" className="w-full md:w-auto rounded-lg h-11 px-6">
+        <Button
+          type="submit"
+          className="w-full md:w-auto rounded-lg h-11 px-6"
+          disabled={isSubmitting}
+        >
           Save changes
         </Button>
       </div>
