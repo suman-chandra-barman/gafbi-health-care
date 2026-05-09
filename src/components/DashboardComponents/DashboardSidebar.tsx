@@ -1,17 +1,23 @@
 /** @format */
 "use client";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { CloudUpload, Headset, List, LogOut, Truck, User } from "lucide-react";
+import { CloudUpload, List, LogOut, Truck, User } from "lucide-react";
 import { useDashboardSidebar } from "./DashboardSidebarProvider";
 import { Button } from "../ui/button";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { logout } from "@/redux/features/auth/authSlice";
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
   const { isCollapsed, isMobileMenuOpen, closeMobileMenu } =
     useDashboardSidebar();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const user = useAppSelector((state) => state.auth.user);
+  const isUserReady = Boolean(user?.email_address);
 
   const navItems = [
     {
@@ -33,11 +39,6 @@ export default function DashboardSidebar() {
       href: "/dashboard/login-data",
       icon: CloudUpload,
       label: "Login data",
-    },
-    {
-      href: "/dashboard/customer-service",
-      icon: Headset,
-      label: "Customer service",
     },
   ];
 
@@ -79,12 +80,21 @@ export default function DashboardSidebar() {
 
         {!isCollapsed && (
           <div className="px-5 py-6">
-            <p className="text-[1.05rem] font-semibold leading-none text-[#345f86]">
-              Alex Morgan
-            </p>
-            <p className="mt-1 text-[0.76rem] leading-none text-[#6e89a1]">
-              alexmorgan86@gmail.com
-            </p>
+            {isUserReady ? (
+              <>
+                <p className="text-[1.05rem] font-semibold leading-none text-[#345f86]">
+                  {user?.name ? user?.name : user?.email_address.split("@")[0]}
+                </p>
+                <p className="mt-1 text-[0.76rem] leading-none text-[#6e89a1]">
+                  {user?.email_address}
+                </p>
+              </>
+            ) : (
+              <div className="space-y-2 animate-pulse">
+                <div className="h-4 w-36 rounded bg-[#c9d8e6]" />
+                <div className="h-3 w-44 rounded bg-[#d8e3ee]" />
+              </div>
+            )}
           </div>
         )}
 
@@ -116,9 +126,12 @@ export default function DashboardSidebar() {
         <div className={cn("mt-auto pb-5", isCollapsed ? "px-2" : "px-3")}>
           <Button
             type="button"
-            onClick={closeMobileMenu}
+            onClick={() => {
+              dispatch(logout());
+              router.push("/signin");
+            }}
             className={cn(
-              "w-full rounded-xl py-3 text-[0.96rem] font-medium text-[#b42318] hover:bg-[#fdecec]",
+              "w-full rounded-xl py-3 text-[0.96rem] font-medium text-[#b42318] hover:bg-[#fdecec] cursor-pointer",
               isCollapsed
                 ? "flex h-11 items-center justify-center px-2"
                 : "flex items-center gap-3 px-4",
