@@ -3,6 +3,7 @@
 "use client";
 
 import Image from "next/image";
+import { pdf } from "@react-pdf/renderer";
 import { MoveLeft, NotebookText, RefreshCw } from "lucide-react";
 import React, { useState, useRef } from "react";
 import { PiWarning } from "react-icons/pi";
@@ -10,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { useApplyCareBoxMutation } from "@/redux/features/careBox/careBoxApi";
 import type { ApplyCareBoxPayload } from "@/redux/features/careBox/careBoxApi";
+import CostCoverageDocument from "./CostCoverageDocument";
 
 interface ApplicationStepProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -162,6 +164,35 @@ export default function ApplicationStep({
     const ctx = canvas.getContext("2d");
     if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
     setHasSignature(false);
+  };
+
+  const buildPdfData = () => {
+    const signatureDataUrl =
+      canvasRef.current?.toDataURL("image/png") ||
+      formData.applicationSign.signatureDataUrl ||
+      "";
+
+    return {
+      ...data,
+      insurance: formData.insurance,
+      applicationSign: {
+        ...formData.applicationSign,
+        signatureDataUrl,
+      },
+    };
+  };
+
+  const handleOpenCostCoveragePdf = async () => {
+    try {
+      const pdfData = buildPdfData();
+      const blob = await pdf(<CostCoverageDocument data={pdfData} />).toBlob();
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, "_blank", "noopener,noreferrer");
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
+    } catch (error) {
+      console.error("Failed to generate PDF:", error);
+      toast("Failed to generate PDF");
+    }
   };
 
   const mapGender = (value: string): ApplyCareBoxPayload["gender"] => {
@@ -377,14 +408,13 @@ export default function ApplicationStep({
           </p>
 
           <div className="mb-4 flex flex-col gap-2">
-            <a
-              href="/files/Open application for cost coverage.pdf"
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
+              onClick={handleOpenCostCoveragePdf}
               className="inline-flex items-center gap-2 text-xs text-button-bg underline sm:text-sm"
             >
               <NotebookText /> Open application for cost coverage
-            </a>
+            </button>
             <a
               href="/files/Open application for a change of supplier.pdf"
               target="_blank"
