@@ -1,9 +1,6 @@
 /** @format */
 "use client";
-import React from "react";
 import GafbiBoxItem from "./GafbiBoxItem";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 interface BoxItem {
   id: string;
@@ -31,13 +28,6 @@ const GafbiBoxContents = ({ items }: GafbiBoxContentsProps) => {
             imageSrc={item.imageSrc}
           />
         ))}
-      </div>
-      <div className="mt-6">
-        <Button asChild className="w-full md:w-auto rounded-lg h-11 px-6">
-          <Link href="/dashboard/manage-gafbi-box">
-            Customize your Gafbi box
-          </Link>
-        </Button>
       </div>
     </div>
   );
