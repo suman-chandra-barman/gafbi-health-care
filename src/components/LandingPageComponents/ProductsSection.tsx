@@ -4,38 +4,18 @@ import Image from "next/image";
 import { MoveLeft, MoveRight } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import Link from "next/link";
+import { useGetProductsQuery } from "@/redux/features/products/productsApi";
+import ProductCardSkeleton from "../Skeleton/ProductCardSkeleton";
 
-const products = [
-  {
-    name: "Disinfectant Wipes",
-    unit: "9 Pieces/box",
-    image: "/mikrozid.png",
-  },
-  {
-    name: "Hand Disinfectant",
-    unit: "170 ml/bottle",
-    image: "/desderman.png",
-  },
-  {
-    name: "Hand Disinfectant",
-    unit: "170 ml/bottle",
-    image: "/antifect.png",
-  },
-  {
-    name: "Hand Disinfectant",
-    unit: "170 ml/bottle",
-    image: "/desderman.png",
-  },
-  {
-    name: "Hand Disinfectant",
-    unit: "170 ml/bottle",
-    image: "/antifect.png",
-  },
-];
 
 export default function ProductsSection() {
+    const { data, isLoading, isError } = useGetProductsQuery();
+    const products = data?.data ?? [];
+
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
+
 
   const visibleCount = useMemo(() => {
     // Keep layout behavior consistent across breakpoints by matching prior columns.
@@ -73,14 +53,19 @@ export default function ProductsSection() {
               transform: `translateX(-${index * (100 / visibleCount)}%)`,
             }}
           >
-            {products.map((product, productIndex) => (
-              <article
-                key={`${product.image}-${productIndex}`}
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, index) => (
+                <ProductCardSkeleton key={`skeleton-${index}`} />
+              ))
+            ) : (
+              products.map((product) => (
+                <article
+                key={`${product.id}`}
                 className="group w-full shrink-0 rounded-xl bg-background p-4 sm:p-5 md:w-[calc((100%-2rem)/3)] xl:w-[calc((100%-3rem)/4)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
               >
                 <div className="flex h-57.5 items-center justify-center sm:h-75">
                   <Image
-                    src={product.image}
+                    src={`${process.env.NEXT_PUBLIC_BASE_URL}${product.image_url}`}
                     alt={product.name}
                     width={240}
                     height={240}
@@ -97,16 +82,19 @@ export default function ProductsSection() {
                         {product.unit}
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      className="rounded-md cursor-pointer bg-button-bg px-2 py-1 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0"
-                    >
-                      {t("landing.addToBox")}
-                    </button>
+                    <Link href={`/apply-box`}>
+                      <button
+                        type="button"
+                        className="rounded-md cursor-pointer bg-button-bg px-2 py-1 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0"
+                        aria-label={`Request booking for ${product.name}`}
+                      >
+                        {t("productsPage.goToCarebox")}
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </article>
-            ))}
+            )))}
           </div>
         </div>
 
