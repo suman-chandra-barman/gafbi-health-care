@@ -99,19 +99,23 @@ const ReviewsAndRatings = ({
         <p className="mb-2 text-base text-(--color-primary)">
           {total_reviews} product rating{total_reviews !== 1 ? "s" : ""}
         </p>
-        {[5, 4, 3, 2, 1].map((star) => (
-          <div key={star} className="mb-2 flex items-center gap-2 text-sm">
-            <span className="w-4">{star}</span>
-            <div className="h-1.5 w-full rounded bg-slate-200">
-              <div
-                className="h-1.5 rounded bg-[#d3a008]"
-                style={{
-                  width: `${getStarPercentage(rating_breakdown[star as keyof RatingBreakdown], totalRatings)}%`,
-                }}
-              />
+        {[5, 4, 3, 2, 1].map((star) => {
+          const starKey = String(star) as keyof RatingBreakdown;
+
+          return (
+            <div key={star} className="mb-2 flex items-center gap-2 text-sm">
+              <span className="w-4">{star}</span>
+              <div className="h-1.5 w-full rounded bg-slate-200">
+                <div
+                  className="h-1.5 rounded bg-[#d3a008]"
+                  style={{
+                    width: `${getStarPercentage(rating_breakdown[starKey], totalRatings)}%`,
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         <div className="mt-8">
           <h3 className="mb-2 text-lg font-semibold text-(--color-primary)">
