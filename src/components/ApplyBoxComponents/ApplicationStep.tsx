@@ -187,8 +187,23 @@ export default function ApplicationStep({
       const pdfData = buildPdfData();
       const blob = await pdf(<CostCoverageDocument data={pdfData} />).toBlob();
       const blobUrl = URL.createObjectURL(blob);
+
       window.open(blobUrl, "_blank", "noopener,noreferrer");
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
+
+      const anchor = document.createElement("a");
+      anchor.href = blobUrl;
+      anchor.download = "cost-coverage-application.pdf";
+      anchor.style.display = "none";
+      document.body.appendChild(anchor);
+
+      setTimeout(() => {
+        anchor.click();
+        anchor.remove();
+      }, 500);
+
+      setTimeout(() => {
+        URL.revokeObjectURL(blobUrl);
+      }, 30000);
     } catch (error) {
       console.error("Failed to generate PDF:", error);
       toast("Failed to generate PDF");
