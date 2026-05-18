@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,11 @@ import {
 import { MoveLeft, MoveRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
+import {
+  selectCurrentToken,
+  selectCurrentUser,
+} from "@/redux/features/auth/authSlice";
+import { useAppSelector } from "@/redux/hooks";
 
 interface DataEntryStepProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,6 +34,8 @@ export default function DataEntryStep({
 }: DataEntryStepProps) {
   const { t } = useTranslation();
   const router = useRouter();
+  const currentUser = useAppSelector(selectCurrentUser);
+  const currentToken = useAppSelector(selectCurrentToken);
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [formData, setFormData] = useState({
     personalDetails: data.personalDetails,
@@ -37,6 +44,11 @@ export default function DataEntryStep({
     consultation: data.consultation,
   });
   const [currentSubStep, setCurrentSubStep] = useState(1);
+
+  const isLoggedIn = useMemo(
+    () => Boolean(currentUser && currentToken),
+    [currentToken, currentUser],
+  );
 
   const handleInputChange = (
     section: string,
@@ -56,6 +68,11 @@ export default function DataEntryStep({
     if (currentSubStep < 3) {
       setCurrentSubStep(currentSubStep + 1);
     } else {
+      if (isLoggedIn) {
+        onNext(formData);
+        return;
+      }
+
       setShowAccountModal(true);
     }
   };
@@ -71,12 +88,12 @@ export default function DataEntryStep({
 
   const handleCreateAccount = () => {
     setShowAccountModal(false);
-    onNext(formData);
+    router.push("/register");
   };
 
-  const handleSkipAccount = () => {
+  const handleSignIn = () => {
     setShowAccountModal(false);
-    router.push("/");
+    router.push("/signin");
   };
 
   const isStep1Valid = () => {
@@ -627,28 +644,27 @@ export default function DataEntryStep({
       <Dialog open={showAccountModal} onOpenChange={setShowAccountModal}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-primary">
-              Manage Care Box Online
+            <DialogTitle className="text-xl font-bold text-primary">
+              Account Creation
             </DialogTitle>
-            <h1 className="text-xl font-bold">Create and Account</h1>
             <DialogDescription className="text-secondary">
-              For faster and easier care box management, we suggest creating a
-              user account.
+              Sign in to continue with your saved details, or create an account
+              to manage your care box faster.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-3">
             <button
-              onClick={handleCreateAccount}
-              className="w-full cursor-pointer rounded-md bg-button-bg py-2 text-sm font-semibold text-white hover:opacity-90 transition-all"
+              onClick={handleSignIn}
+              className="w-full cursor-pointer rounded-md border border-button-bg py-2 text-sm font-semibold text-button-bg transition-all hover:bg-button-bg hover:text-white"
             >
-              Create
+              Sign in
             </button>
             <button
-              onClick={handleSkipAccount}
-              className="w-full cursor-pointer rounded-md border-2 border-button-bg py-2 text-sm font-semibold text-button-bg hover:bg-blue-50 transition-all"
+              onClick={handleCreateAccount}
+              className="w-full cursor-pointer rounded-md bg-button-bg py-2 text-sm font-semibold text-white transition-all hover:opacity-90"
             >
-              Do not manage care box online
+              Create account
             </button>
           </div>
         </DialogContent>
