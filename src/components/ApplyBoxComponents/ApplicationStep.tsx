@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { useApplyCareBoxMutation } from "@/redux/features/careBox/careBoxApi";
 import type { ApplyCareBoxPayload } from "@/redux/features/careBox/careBoxApi";
 import CostCoverageDocument from "./CostCoverageDocument";
+import ChangeSupplierDocument from "./ChangeSupplierDocument";
 
 interface ApplicationStepProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -193,6 +194,36 @@ export default function ApplicationStep({
       const anchor = document.createElement("a");
       anchor.href = blobUrl;
       anchor.download = "cost-coverage-application.pdf";
+      anchor.style.display = "none";
+      document.body.appendChild(anchor);
+
+      setTimeout(() => {
+        anchor.click();
+        anchor.remove();
+      }, 500);
+
+      setTimeout(() => {
+        URL.revokeObjectURL(blobUrl);
+      }, 30000);
+    } catch (error) {
+      console.error("Failed to generate PDF:", error);
+      toast("Failed to generate PDF");
+    }
+  };
+
+  const handleOpenChangeSupplierPdf = async () => {
+    try {
+      const pdfData = buildPdfData();
+      const blob = await pdf(
+        <ChangeSupplierDocument data={pdfData} />,
+      ).toBlob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      window.open(blobUrl, "_blank", "noopener,noreferrer");
+
+      const anchor = document.createElement("a");
+      anchor.href = blobUrl;
+      anchor.download = "change-of-supplier-application.pdf";
       anchor.style.display = "none";
       document.body.appendChild(anchor);
 
@@ -430,14 +461,13 @@ export default function ApplicationStep({
             >
               <NotebookText /> Open application for cost coverage
             </button>
-            <a
-              href="/files/Open application for a change of supplier.pdf"
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
+              onClick={handleOpenChangeSupplierPdf}
               className="inline-flex items-center gap-2 text-xs text-button-bg underline sm:text-sm"
             >
               <NotebookText /> Open application for a change of supplier
-            </a>
+            </button>
           </div>
 
           <div className="mb-4 rounded-md border-2 border-gray-200 bg-gray-50 p-3 sm:p-4">
