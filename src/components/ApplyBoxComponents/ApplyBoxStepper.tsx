@@ -85,7 +85,6 @@ export default function ApplyBoxStepper() {
   };
 
   const handleComplete = () => {
-    console.log("Application completed with data:", formData);
     setIsApplicationCompleted(true);
   };
 
