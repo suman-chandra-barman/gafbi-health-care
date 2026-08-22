@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "l9vtwvjb-8002.inc1.devtunnels.ms",
+        hostname: process.env.NEXT_PUBLIC_HOSTNAME || "",
         port: "",
         pathname: "/media/**",
       },
