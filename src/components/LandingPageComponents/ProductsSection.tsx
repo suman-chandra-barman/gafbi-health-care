@@ -10,7 +10,7 @@ import ProductCardSkeleton from "../Skeleton/ProductCardSkeleton";
 
 
 export default function ProductsSection() {
-    const { data, isLoading, isError } = useGetProductsQuery();
+    const { data, isLoading } = useGetProductsQuery();
     const products = data?.data ?? [];
 
   const { t } = useTranslation();

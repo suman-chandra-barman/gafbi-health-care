@@ -8,7 +8,6 @@ interface ItemsProgressProps {
 }
 
 const ItemsProgress = ({ currentCount, maxCount }: ItemsProgressProps) => {
-  const remainingItems = maxCount - currentCount;
   const progress = (currentCount / maxCount) * 100;
 
   return (

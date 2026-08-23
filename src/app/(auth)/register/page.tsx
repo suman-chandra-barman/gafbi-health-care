@@ -44,7 +44,7 @@ export default function RegisterPage() {
       }
 
       toast.error(response?.message || "Signup failed.");
-    } catch (error) {
+    } catch {
       toast.error("Signup failed.");
     }
   };

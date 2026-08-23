@@ -41,7 +41,7 @@ export default function SignInPage() {
       }
 
       toast.error(response?.message || "Login failed.");
-    } catch (error) {
+    } catch {
       toast.error("Login failed.");
     }
   };

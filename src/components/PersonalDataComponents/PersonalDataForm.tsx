@@ -1,6 +1,7 @@
 /** @format */
 "use client";
 import React from "react";
+import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -70,10 +71,13 @@ const PersonalDataForm = ({
       <div className="flex items-center gap-4">
         <div className="h-20 w-20 overflow-hidden rounded-full bg-slate-100">
           {formData.imageUrl ? (
-            <img
+            <Image
               src={formData.imageUrl}
               alt="Profile"
+              width={80}
+              height={80}
               className="h-full w-full object-cover"
+              unoptimized={formData.imageUrl.startsWith("blob:") || formData.imageUrl.startsWith("data:")}
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-xs text-tertiary">

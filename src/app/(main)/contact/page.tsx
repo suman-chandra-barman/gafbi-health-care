@@ -43,7 +43,7 @@ const ContactPage = () => {
       }
 
       toast.error(response?.message || "Failed to submit contact message.");
-    } catch (error) {
+    } catch {
       toast.error("Failed to submit contact message.");
     }
   };

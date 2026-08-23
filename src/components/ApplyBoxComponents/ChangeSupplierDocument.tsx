@@ -1,6 +1,6 @@
 /** @format */
 
-import { Document, Image, Page, Text, View } from "@react-pdf/renderer";
+import { Document, Image as PdfImage, Page, Text, View } from "@react-pdf/renderer";
 import type { CareboxFormData } from "@/types/carebox";
 import { changeSupplierStyles as styles } from "./ChangeSupplierDocument.styles";
 
@@ -36,7 +36,10 @@ export default function ChangeSupplierDocument({
       <Page size="A4" style={styles.page}>
         <View style={styles.headerRow}>
           <View style={styles.logoRow}>
-            <Image src={logoSrc} style={styles.logoImage} />
+            <PdfImage
+              src={logoSrc}
+              style={styles.logoImage}
+            />
             <Text style={styles.logo}>Gafbi Health Care</Text>
           </View>
           <View style={styles.senderBox}>

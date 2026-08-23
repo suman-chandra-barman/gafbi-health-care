@@ -45,7 +45,7 @@ export default function ResetPasswordPage() {
       }
 
       toast.error(response?.message || "Password reset failed.");
-    } catch (error) {
+    } catch {
       toast.error("Password reset failed.");
     }
   };

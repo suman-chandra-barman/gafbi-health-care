@@ -1,6 +1,6 @@
 /** @format */
 
-import { Document, Image, Page, Text, View } from "@react-pdf/renderer";
+import { Document, Image as PdfImage, Page, Text, View } from "@react-pdf/renderer";
 import type { CareboxFormData } from "@/types/carebox";
 import { styles } from "./CostCoverageDocument.styles";
 
@@ -232,7 +232,7 @@ export default function CostCoverageDocument({
               <Text style={styles.fieldLabel}>Signature</Text>
               <View style={styles.signatureBox}>
                 {data.applicationSign.signatureDataUrl ? (
-                  <Image
+                  <PdfImage
                     src={data.applicationSign.signatureDataUrl}
                     style={styles.signatureImage}
                   />
@@ -350,7 +350,7 @@ export default function CostCoverageDocument({
             <Text style={styles.largeTitle}>Signature</Text>
             <View style={styles.signatureBox}>
               {data.applicationSign.signatureDataUrl ? (
-                <Image
+                <PdfImage
                   src={data.applicationSign.signatureDataUrl}
                   style={styles.signatureImage}
                 />
