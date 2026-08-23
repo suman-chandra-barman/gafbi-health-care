@@ -9,6 +9,7 @@ import { useDashboardSidebar } from "./DashboardSidebarProvider";
 import { Button } from "../ui/button";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { logout } from "@/redux/features/auth/authSlice";
+import { useLogoutMutation } from "@/redux/features/auth/authApi";
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
@@ -17,7 +18,17 @@ export default function DashboardSidebar() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const user = useAppSelector((state) => state.auth.user);
+  const [logoutApi] = useLogoutMutation();
   const isUserReady = Boolean(user?.email_address);
+
+  const handleLogout = async () => {
+    try {
+      await logoutApi(undefined).unwrap();
+    } catch {
+      dispatch(logout());
+    }
+    router.push("/signin");
+  };
 
   const navItems = [
     {
@@ -126,10 +137,7 @@ export default function DashboardSidebar() {
         <div className={cn("mt-auto pb-5", isCollapsed ? "px-2" : "px-3")}>
           <Button
             type="button"
-            onClick={() => {
-              dispatch(logout());
-              router.push("/signin");
-            }}
+            onClick={handleLogout}
             className={cn(
               "w-full rounded-xl py-3 text-[0.96rem] font-medium text-[#b42318] hover:bg-[#fdecec] cursor-pointer",
               isCollapsed

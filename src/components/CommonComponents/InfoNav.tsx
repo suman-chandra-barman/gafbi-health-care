@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import i18n, { AppLanguage, languageStorageKey } from "@/lib/i18n";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { logout, selectCurrentUser } from "@/redux/features/auth/authSlice";
+import { useLogoutMutation } from "@/redux/features/auth/authApi";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
@@ -24,6 +25,7 @@ export default function InfoNav() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectCurrentUser);
+  const [logoutApi] = useLogoutMutation();
   const displayName = user?.email_address?.split("@")[0] || "Profile";
 
   if (HIDDEN_ROUTES.includes(pathname)) return null;
@@ -33,6 +35,16 @@ export default function InfoNav() {
     i18n.changeLanguage(targetLanguage);
     window.localStorage.setItem(languageStorageKey, targetLanguage);
     document.documentElement.lang = targetLanguage;
+  };
+
+  const handleLogout = async () => {
+    setIsProfileOpen(false);
+    try {
+      await logoutApi(undefined).unwrap();
+    } catch {
+      dispatch(logout());
+    }
+    router.push("/signin");
   };
 
   return (
@@ -101,11 +113,7 @@ export default function InfoNav() {
                     <Button
                       variant="ghost"
                       className="w-full justify-start gap-2 text-[#b42318] hover:bg-[#fdecec] py-4 cursor-pointer"
-                      onClick={() => {
-                        dispatch(logout());
-                        setIsProfileOpen(false);
-                        router.push("/signin");
-                      }}
+                      onClick={handleLogout}
                     >
                       {t("infoNav.logout")}
                     </Button>

@@ -65,10 +65,11 @@ export default function EmailVerifyPage() {
       }).unwrap();
 
       if (response?.success) {
+        const access = response.data?.tokens?.access;
         dispatch(
           setCredentials({
-            user: response.data.user,
-            tokens: response.data.tokens,
+            user: response.data?.user || null,
+            token: access,
           }),
         );
         toast.success(t("toasts.otpVerified"));
@@ -77,7 +78,7 @@ export default function EmailVerifyPage() {
       }
 
       toast.error(response?.message || "Verification failed.");
-    } catch (error) {
+    } catch {
       toast.error("Verification failed.");
     }
   };

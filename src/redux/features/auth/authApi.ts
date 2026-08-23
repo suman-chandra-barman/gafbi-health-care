@@ -1,5 +1,5 @@
 import { baseApi } from "@/redux/api/baseApi";
-import { updateUser } from "@/redux/features/auth/authSlice";
+import { logout as logoutAction, updateUser } from "@/redux/features/auth/authSlice";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -32,6 +32,28 @@ export const authApi = baseApi.injectEndpoints({
         body: credentials,
       }),
       invalidatesTags: ["User"],
+    }),
+    logout: builder.mutation({
+      query: () => ({
+        url: "/auth/logout/",
+        method: "POST",
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } catch {
+          // ignore logout network failure, still clean up client state
+        } finally {
+          dispatch(logoutAction());
+          dispatch(baseApi.util.resetApiState());
+        }
+      },
+    }),
+    refreshToken: builder.mutation({
+      query: () => ({
+        url: "/auth/refresh/",
+        method: "POST",
+      }),
     }),
     forgotPassword: builder.mutation({
       query: (data) => ({
@@ -72,8 +94,10 @@ export const authApi = baseApi.injectEndpoints({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          if (data.success) {
+          if (data.success && data.data?.user) {
             dispatch(updateUser(data.data.user));
+          } else if (data.success && data.data) {
+            dispatch(updateUser(data.data));
           }
         } catch {
           // silently ignore
@@ -123,11 +147,15 @@ export const {
   useVerifyEmailMutation,
   useResendEmailVerifyOtpMutation,
   useLoginMutation,
+  useLogoutMutation,
+  useRefreshTokenMutation,
   useForgotPasswordMutation,
   useVerifyForgotPasswordOtpMutation,
   useResetPasswordMutation,
   useChangePasswordMutation,
   useGetMeQuery,
+  useLazyGetMeQuery,
   useGetUserAccountSettingsQuery,
   useUpdateUserAccountMutation,
 } = authApi;
+
