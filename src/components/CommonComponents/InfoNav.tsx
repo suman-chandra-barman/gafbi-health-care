@@ -8,10 +8,16 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import i18n, { AppLanguage, languageStorageKey } from "@/lib/i18n";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { logout, selectCurrentUser } from "@/redux/features/auth/authSlice";
+import {
+  logout,
+  selectCurrentUser,
+  selectIsAuthInitialized,
+} from "@/redux/features/auth/authSlice";
 import { useLogoutMutation } from "@/redux/features/auth/authApi";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { useGetUserDashboardOverviewQuery } from "@/redux/features/dashboard/overview/overviewApi";
+import { toast } from "react-toastify";
 
 const HIDDEN_ROUTES = ["/apply-box"];
 
@@ -25,8 +31,11 @@ export default function InfoNav() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectCurrentUser);
+  const isInitialized = useAppSelector(selectIsAuthInitialized);
   const [logoutApi] = useLogoutMutation();
-  const displayName = user?.email_address?.split("@")[0] || "Profile";
+  const { data: overviewData } = useGetUserDashboardOverviewQuery();
+
+  const displayName = user?.name || user?.email_address?.split("@")[0];
 
   if (HIDDEN_ROUTES.includes(pathname)) return null;
 
@@ -35,6 +44,16 @@ export default function InfoNav() {
     i18n.changeLanguage(targetLanguage);
     window.localStorage.setItem(languageStorageKey, targetLanguage);
     document.documentElement.lang = targetLanguage;
+  };
+
+  const handleDashboardRedirect = () => {
+    setIsProfileOpen(false);
+    if (!overviewData?.data) {
+      router.push("/dashboard/overview");
+    } else {
+      toast.warning("You need to add at least 1 care box before proceeding.")
+      router.push("/apply-box");
+    }
   };
 
   const handleLogout = async () => {
@@ -75,7 +94,9 @@ export default function InfoNav() {
               </Link>
             </div>
 
-            {user ? (
+            {!isInitialized ? (
+              <div className="h-9 w-16 rounded-xl bg-white/60 animate-pulse" />
+            ) : user ? (
               <Popover open={isProfileOpen} onOpenChange={setIsProfileOpen}>
                 <PopoverTrigger asChild>
                   <button
@@ -103,10 +124,7 @@ export default function InfoNav() {
                     <Button
                       variant="ghost"
                       className="w-full justify-start gap-2 text-[#123a5b] hover:bg-[#eef4f8] py-4 cursor-pointer"
-                      onClick={() => {
-                        setIsProfileOpen(false);
-                        router.push("/dashboard/overview");
-                      }}
+                      onClick={() => handleDashboardRedirect()}
                     >
                       {t("infoNav.dashboard")}
                     </Button>
