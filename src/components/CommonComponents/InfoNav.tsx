@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   logout,
   selectCurrentUser,
+  selectCurrentToken,
   selectIsAuthInitialized,
 } from "@/redux/features/auth/authSlice";
 import { useLogoutMutation } from "@/redux/features/auth/authApi";
@@ -31,9 +32,12 @@ export default function InfoNav() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectCurrentUser);
+  const token = useAppSelector(selectCurrentToken);
   const isInitialized = useAppSelector(selectIsAuthInitialized);
   const [logoutApi] = useLogoutMutation();
-  const { data: overviewData } = useGetUserDashboardOverviewQuery();
+  const { data: overviewData } = useGetUserDashboardOverviewQuery(undefined, {
+    skip: !token,
+  });
 
   const displayName = user?.name || user?.email_address?.split("@")[0];
 
